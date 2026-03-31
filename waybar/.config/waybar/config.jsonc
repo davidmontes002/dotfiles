@@ -1,0 +1,64 @@
+{
+    "layer": "top",
+    "position": "left",
+    "width": 38, // AHORA MÁS DELGADA
+    "spacing": 6,
+    
+    // ORDEN DE LOS MÓDULOS (Sin cambios)
+    "modules-left": ["custom/arch", "hyprland/workspaces", "tray"],
+    "modules-center": ["custom/desktop"],
+    "modules-right": ["pulseaudio", "clock", "temperature", "cpu", "memory"],
+
+    // --- CONFIGURACIÓN ARRIBA ---
+    "custom/arch": {
+        "format": "",
+        "tooltip": false
+    },
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "disable-scroll": true
+    },
+    "tray": {
+        "spacing": 8
+    },
+
+    // --- CONFIGURACIÓN CENTRO ---
+    // AHORA APILADO LETRA POR LETRA
+    "custom/desktop": {
+        "format": "\nD\nS\nK\nT\nO\nP", 
+        "tooltip": false,
+        "justify": "center"
+    },
+
+    // --- CONFIGURACIÓN ABAJO ---
+    "network": {
+        "format-ethernet": "\n{bandwidthDownBytes}",
+        "format-wifi": "\n{bandwidthDownBytes}",
+        "format-disconnected": "",
+        "interval": 2,
+        "justify": "center"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "",
+        "format-icons": ["", "", ""],
+        "on-click": "pavucontrol" 
+    },
+    "clock": {
+        "format": "{:%H\n%M}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "justify": "center"
+    },
+    "temperature": {
+        "format": "\n{temperatureC}°",
+        "justify": "center"
+    },
+    "cpu": {
+        "format": "\n{usage}%",
+        "justify": "center"
+    },
+    "memory": {
+        "format": "󰍛\n{percentage}%", // ÍCONO DE RAM CORREGIDO
+        "justify": "center"
+    }
+}
