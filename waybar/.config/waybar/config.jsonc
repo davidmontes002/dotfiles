@@ -1,55 +1,60 @@
 {
     "layer": "top",
     "position": "left",
-    "width": 38, // AHORA MÁS DELGADA
-    "spacing": 6,
+    "width": 38,
+    "spacing": 4,
     
-    // ORDEN DE LOS MÓDULOS (Sin cambios)
+    // Módulos divididos por secciones
     "modules-left": ["custom/arch", "hyprland/workspaces", "tray"],
     "modules-center": ["custom/desktop"],
     "modules-right": ["pulseaudio", "clock", "temperature", "cpu", "memory"],
 
-    // --- CONFIGURACIÓN ARRIBA ---
+    // --- ARRIBA ---
     "custom/arch": {
         "format": "",
         "tooltip": false
     },
+
     "hyprland/workspaces": {
         "format": "{name}",
-        "disable-scroll": true
+        "on-click": "activate",
+        "disable-scroll": true,
+        "all-outputs": true
     },
+
     "tray": {
+        "icon-size": 16,
         "spacing": 8
     },
 
-    // --- CONFIGURACIÓN CENTRO ---
-    // AHORA APILADO LETRA POR LETRA
+    // --- CENTRO ---
     "custom/desktop": {
-        "format": "\nD\nS\nK\nT\nO\nP", 
-        "tooltip": false,
+        "format": "\nD\nS\nK\nT\nO\nP",
         "justify": "center"
     },
 
-    // --- CONFIGURACIÓN ABAJO ---
-    "network": {
-        "format-ethernet": "\n{bandwidthDownBytes}",
-        "format-wifi": "\n{bandwidthDownBytes}",
-        "format-disconnected": "",
-        "interval": 2,
-        "justify": "center"
-    },
+    // --- ABAJO ---
     "pulseaudio": {
         "format": "{icon}",
-        "format-muted": "",
-        "format-icons": ["", "", ""],
-        "on-click": "pavucontrol" 
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol",
+        "scroll-step": 5,
+        "justify": "center",
+        "tooltip-format": "{volume}%"
     },
+
     "clock": {
         "format": "{:%H\n%M}",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>",
-        "justify": "center"
+        "justify": "center",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>"
     },
     "temperature": {
+        // Le damos la ruta directa y exacta al sensor de tu procesador AMD
+        "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
+        "critical-threshold": 80,
         "format": "\n{temperatureC}°",
         "justify": "center"
     },
@@ -57,8 +62,9 @@
         "format": "\n{usage}%",
         "justify": "center"
     },
+
     "memory": {
-        "format": "󰍛\n{percentage}%", // ÍCONO DE RAM CORREGIDO
+        "format": "󰍛\n{percentage}%",
         "justify": "center"
     }
 }

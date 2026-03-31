@@ -1,79 +1,80 @@
 * {
     border: none;
     border-radius: 0;
-    /* Usamos JetBrainsMono Nerd Font como principal para iconos sólidos */
     font-family: "JetBrainsMono Nerd Font", "FontAwesome", sans-serif;
-    font-size: 11px; /* Letra ligeramente más pequeña para que quepa */
+    font-size: 11px;
     min-height: 0;
 }
 
-/* El fondo principal (Cristal) */
+/* El fondo principal con efecto cristal */
 window#waybar {
-    background-color: rgba(0, 0, 0, 0.4); 
+    background-color: rgba(15, 15, 20, 0.75);
     color: #ffffff;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ================== ARRIBA ================== */
+/* --- ESTILO ARRIBA --- */
 #custom-arch {
-    font-size: 18px; /* Icono un poco más pequeño */
-    color: #1793d1; 
-    margin: 8px 0;
+    font-size: 20px;
+    color: #1793d1;
+    margin: 10px 0;
 }
 
 #workspaces {
-    margin: 5px 0;
+    margin: 4px 0;
 }
 
 #workspaces button {
-    min-width: 20px; /* Pestañas más pequeñas y estilizadas */
-    min-height: 20px;
-    padding: 1px;
-    margin: 3px 2px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0;
+    margin: 3px 6px;
+    min-width: 26px;
+    min-height: 26px;
+    background-color: rgba(255, 255, 255, 0.05);
     color: #8c92ac;
+    border-radius: 6px;
     transition: all 0.3s ease;
 }
 
 #workspaces button.active {
+    background-color: #1793d1;
     color: #ffffff;
-    background-color: #1793d1; 
     font-weight: bold;
 }
 
 #tray {
-    margin: 5px 0;
+    margin: 8px 0;
 }
 
-/* ================== CENTRO ================== */
+/* --- ESTILO CENTRO --- */
 #custom-desktop {
-    color: #9ece6a; 
+    color: #9ece6a;
     font-weight: bold;
-    font-size: 10px; /* Más pequeño para el apilado vertical */
-    margin: 0 4px; /* Ajuste para centrar */
+    font-size: 10px;
+    margin: 10px 0;
 }
 
-/* ================== ABAJO ================== */
-/* Unificamos el estilo de los sensores (Ajustado para barra delgada) */
+/* --- ESTILO ABAJO (LOS AZULEJOS) --- */
 #pulseaudio, #clock, #temperature, #cpu, #memory {
-    padding: 6px 0;
-    margin: 3px 2px; /* <-- Cambiado de auto a 2px */
-    border-radius: 6px;
+    padding: 8px 0;
+    margin: 3px 4px;
     background-color: rgba(255, 255, 255, 0.08);
-    font-weight: bold;
-    min-width: 28px;
+    border-radius: 8px;
+    /* Forzamos que todas las cajas sean idénticas */
+    min-width: 30px;
 }
 
-/* Colores específicos para métricas */
-#pulseaudio { font-size: 16px; color: #7aa2f7; }
-#clock { color: #bb9af7; font-size: 10px;}
+/* Ajuste específico para que el icono de audio no sea gigante */
+#pulseaudio {
+    color: #7aa2f7;
+    font-size: 15px; 
+}
+
+#clock { color: #bb9af7; }
 #temperature { color: #e0af68; }
 #cpu { color: #f7768e; }
 #memory { color: #9ece6a; }
 
-/* Alertas de hardware */
-#temperature.critical, #cpu.critical, #memory.critical {
-    color: #ffffff;
-    background-color: #f7768e;
+/* Efecto visual al pasar el mouse por los sensores */
+#pulseaudio:hover, #cpu:hover, #memory:hover {
+    background-color: rgba(255, 255, 255, 0.15);
 }
-#network.disconnected { color: #f7768e; }
