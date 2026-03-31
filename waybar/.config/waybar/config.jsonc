@@ -29,7 +29,7 @@
 
     // --- CENTRO ---
     "custom/desktop": {
-        "format": "\nD\nS\nK\nT\nO\nP",
+        "format": "\n D\n S\n K\n T\n O\n P",
         "justify": "center"
     },
 

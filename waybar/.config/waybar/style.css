@@ -1,3 +1,4 @@
+@import "../../.cache/wal/colors-waybar.css";
 * {
     border: none;
     border-radius: 0;
@@ -16,7 +17,7 @@ window#waybar {
 /* --- ESTILO ARRIBA --- */
 #custom-arch {
     font-size: 20px;
-    color: #1793d1;
+    color: @color4; /* <-- Cambiado a variable dinámica */
     margin: 10px 0;
 }
 
@@ -36,8 +37,8 @@ window#waybar {
 }
 
 #workspaces button.active {
-    background-color: #1793d1;
-    color: #ffffff;
+    background-color: @color4; /* <-- Cambiado a variable dinámica */
+    color: @background; /* <-- Para que el número contraste bien */
     font-weight: bold;
 }
 
@@ -47,9 +48,9 @@ window#waybar {
 
 /* --- ESTILO CENTRO --- */
 #custom-desktop {
-    color: #9ece6a;
+    color: @color5;
     font-weight: bold;
-    font-size: 10px;
+    font-size: 9px;
     margin: 10px 0;
 }
 
@@ -65,14 +66,14 @@ window#waybar {
 
 /* Ajuste específico para que el icono de audio no sea gigante */
 #pulseaudio {
-    color: #7aa2f7;
+    color: @color5; /* <-- Dinámico */
     font-size: 15px; 
 }
 
-#clock { color: #bb9af7; }
-#temperature { color: #e0af68; }
-#cpu { color: #f7768e; }
-#memory { color: #9ece6a; }
+#clock { color: @color6; }
+#temperature { color: @color3; }
+#cpu { color: @color1; }
+#memory { color: @color2; }
 
 /* Efecto visual al pasar el mouse por los sensores */
 #pulseaudio:hover, #cpu:hover, #memory:hover {
