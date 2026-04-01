@@ -1,10 +1,10 @@
-# 🦎 Camaleón OS - Hyprland Dynamic Dotfiles
+yprland Dynamic Dotfiles
 
 Este repositorio contiene la configuración automatizada de mi entorno de desarrollo basado en **Arch Linux** y **Hyprland**. 
 
 El núcleo de este sistema es el *Dynamic Ricing*: toda la interfaz (terminal, bordes de ventanas, menús, barra de estado y notificaciones) extrae su paleta de colores automáticamente del fondo de pantalla actual en tiempo real gracias a `Pywal`.
 
-## 🛠️ Tecnologías Principales
+## Tecnologías Principales
 
 * **Gestor de Ventanas:** [Hyprland](https://hyprland.org/) (Wayland)
 * **Terminal:** Kitty
@@ -17,7 +17,7 @@ El núcleo de este sistema es el *Dynamic Ricing*: toda la interfaz (terminal, b
 
 ---
 
-## 🚀 Instalación Automatizada
+## Instalación Automatizada
 
 Diseñé un script que formatea, descarga dependencias, compila paquetes del AUR y crea todos los enlaces simbólicos (`symlinks`) necesarios para tener el entorno listo en un par de minutos.
 
