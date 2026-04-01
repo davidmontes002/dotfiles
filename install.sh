@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "======================================================="
-echo "🚀 INICIANDO INSTALACIÓN DEL ENTORNO DE DESARROLLO 🚀"
+echo "   INICIANDO INSTALACIÓN DEL ENTORNO DE DESARROLLO  "
 echo "======================================================="
 
 # 1. Lista de paquetes a instalar extraída de tu configuración exacta
@@ -23,15 +23,15 @@ PAQUETES=(
   "pavucontrol"                 # Interfaz gráfica para controlar el audio
 )
 
-echo "📦 1/4 Instalando todos los paquetes y dependencias..."
+echo "1/4 Instalando todos los paquetes y dependencias..."
 # Usamos yay para asegurar que instala tanto de repos oficiales como del AUR
 yay -S --needed --noconfirm "${PAQUETES[@]}"
 
-echo "📁 2/4 Preparando la estructura de directorios..."
+echo "2/4 Preparando la estructura de directorios..."
 mkdir -p ~/.config
 mkdir -p ~/.cache/wal
 
-echo "🔗 3/4 Creando los puentes (Enlaces Simbólicos) desde tu Git..."
+echo "3/4 Creando los puentes (Enlaces Simbólicos) desde tu Git..."
 
 # Lista de carpetas estándar en tu repositorio
 APPS=("hypr" "kitty" "rofi" "waybar" "wal" "wlogout")
@@ -58,12 +58,12 @@ mkdir -p ~/.config/mako
 rm -f ~/.config/mako/config
 ln -s ~/.cache/wal/mako ~/.config/mako/config
 
-echo "⚙️ 4/4 Dando permisos de ejecución a tus scripts maestros..."
+echo "4/4 Dando permisos de ejecución a tus scripts maestros..."
 if [ -d "$HOME/dotfiles/scripts" ]; then
   chmod +x $HOME/dotfiles/scripts/*.sh
 fi
 
 echo "======================================================="
-echo "✅ ¡INSTALACIÓN COMPLETADA CON ÉXITO, INGENIERO! ✅"
+echo "INSTALACIÓN COMPLETADA CON ÉXITO, INGENIERO!"
 echo "Solo necesitas reiniciar tu sesión o escribir 'Hyprland' para entrar a tu nuevo hogar."
 echo "======================================================="
