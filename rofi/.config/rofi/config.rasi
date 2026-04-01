@@ -1,1 +1,79 @@
+/* 1. Importar los colores dinámicos de Pywal */
 @import "~/.cache/wal/colors-rofi-dark"
+
+/* 2. Configuración global y tipografía */
+* {
+    font: "sans-serif 12";
+    background-color: transparent;
+    text-color: @foreground;
+    margin: 0px;
+    padding: 0px;
+    spacing: 0px;
+}
+
+/* 3. La ventana principal (El cuadro flotante) */
+window {
+    background-color: @background;
+    border: 2px;
+    border-color: @selected-normal-background; /* Borde dinámico que resalta */
+    border-radius: 12px;
+    width: 35%;
+    padding: 20px;
+}
+
+/* 4. La barra de búsqueda */
+inputbar {
+    background-color: @background;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 0px 0px 20px 0px;
+    border: 1px;
+    border-color: @selected-normal-background;
+}
+
+prompt {
+    text-color: @selected-normal-background;
+    padding: 0px 10px 0px 0px;
+    font: "sans-serif bold 12";
+}
+
+entry {
+    text-color: @foreground;
+    placeholder: "🔍 Buscar aplicación...";
+    placeholder-color: gray;
+}
+
+/* 5. La lista de aplicaciones */
+listview {
+    lines: 7; /* Número de apps visibles */
+    columns: 1;
+    spacing: 8px;
+    scrollbar: false;
+}
+
+/* 6. Cada elemento de la lista (App) */
+element {
+    padding: 10px;
+    border-radius: 8px;
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color: @foreground;
+}
+
+element selected.normal {
+    background-color: @selected-normal-background;
+    text-color: @background; /* Letras oscuras para contrastar con el fondo de color */
+}
+
+/* 7. Iconos y textos */
+element-icon {
+    size: 28px;
+    margin: 0px 15px 0px 0px;
+}
+
+element-text {
+    vertical-align: 0.5;
+    text-color: inherit;
+}
