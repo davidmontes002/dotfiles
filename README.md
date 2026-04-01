@@ -1,4 +1,3 @@
-yprland Dynamic Dotfiles
 
 Este repositorio contiene la configuración automatizada de mi entorno de desarrollo basado en **Arch Linux** y **Hyprland**. 
 
