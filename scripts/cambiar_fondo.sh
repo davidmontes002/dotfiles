@@ -10,4 +10,8 @@ awww img "$IMAGEN" --transition-type wipe
 wal -q -i "$IMAGEN"
 
 # 3. Reiniciamos Waybar para que lea los nuevos colores
-killall waybar ; hyprctl dispatch exec waybar
+killall waybar
+hyprctl dispatch exec waybar
+
+# 4. Recargamos los colores de las notificaciones flotantes
+makoctl reload
