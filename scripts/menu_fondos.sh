@@ -6,7 +6,7 @@ DIR="$HOME/dotfiles/fondos"
 ELEGIDO=$(find "$DIR" -type f \( -iname "*.jpg" -o -iname "*.png" \) | while read -r img; do
     nombre=$(basename "$img")
     echo -en "$nombre\0icon\x1f$img\n"
-done | rofi -dmenu -i -p "🖼️ Fondos" -show-icons -theme-str '
+done | rofi -dmenu -i -p "Fondos" -show-icons -theme-str '
 window { width: 60%; padding: 20px; border-radius: 12px; }
 listview { columns: 4; lines: 2; spacing: 20px; flow: horizontal; }
 element { orientation: vertical; padding: 10px; border-radius: 8px; }

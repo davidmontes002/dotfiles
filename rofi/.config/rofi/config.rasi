@@ -39,7 +39,7 @@ prompt {
 
 entry {
     text-color: @foreground;
-    placeholder: "🔍 Buscar aplicación...";
+    placeholder: "Buscar aplicación...";
     placeholder-color: gray;
 }
 
