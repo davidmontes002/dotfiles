@@ -1,13 +1,13 @@
 {
     "layer": "top",
     "position": "left",
-    "width": 38,
+    "width": 50,
     "spacing": 4,
     
     // Módulos divididos por secciones
     "modules-left": ["custom/arch", "hyprland/workspaces", "tray"],
     "modules-center": ["custom/desktop"],
-    "modules-right": ["pulseaudio", "clock", "temperature", "cpu", "memory"],
+    "modules-right": ["pulseaudio", "clock", "temperature", "cpu", "memory","battery"],
 
     // --- ARRIBA ---
     "custom/arch": {
@@ -65,6 +65,17 @@
 
     "memory": {
         "format": "󰍛\n{percentage}%",
+        "justify": "center"
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon}\n{capacity}%",
+        "format-charging": "󰂄\n{capacity}%",
+        "format-plugged": "\n{capacity}%",
+        "format-icons": ["", "", "", "", ""],
         "justify": "center"
     }
 }
