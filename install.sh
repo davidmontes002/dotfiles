@@ -8,7 +8,7 @@ echo "======================================================="
 PAQUETES=(
   # --- NÚCLEO Y VISUALES ---
   "hyprland" "kitty" "rofi-wayland" "waybar" "python-pywal" "awww"
-  "mako" "libnotify" "wlogout" "thunar" "materia-gtk-theme" "papirus-icon-theme"
+  "swaync" "libnotify" "wlogout" "thunar" "materia-gtk-theme" "papirus-icon-theme"
 
   # --- FUENTES E ICONOS ---
   "ttf-hack-nerd" "ttf-jetbrains-mono-nerd" "ttf-font-awesome"
@@ -26,6 +26,10 @@ PAQUETES=(
 
   # --- EXTRAS PARA THUNAR ---
   "gvfs" "tumbler"
+
+  # --- PAQUETES DE PERSONALIZACIÓN DE INICIO  ---
+  "fastfetch" # Muestra info del sistema con el logo de la distro
+  "starship"  # Un prompt de shell moderno y muy rápido
 )
 
 echo "1/5 Instalando todos los paquetes y dependencias..."
@@ -37,7 +41,7 @@ mkdir -p ~/.config
 mkdir -p ~/.cache/wal
 
 echo "3/5 Creando los puentes (Enlaces Simbólicos) desde tu Git..."
-APPS=("hypr" "kitty" "rofi" "waybar" "wal" "wlogout")
+APPS=("hypr" "kitty" "rofi" "waybar" "wal" "wlogout" "swaync" "zsh")
 
 for app in "${APPS[@]}"; do
   if [ -d "$HOME/dotfiles/$app/.config/$app" ]; then
@@ -53,12 +57,12 @@ if [ -d "$HOME/dotfiles/gtk/.config/gtk-3.0" ]; then
   rm -rf "$HOME/.config/gtk-3.0"
   ln -s "$HOME/dotfiles/gtk/.config/gtk-3.0" "$HOME/.config/gtk-3.0"
 fi
-
-# Configuración dinámica de Mako
-echo " -> Configurando puente dinámico para Mako..."
-mkdir -p ~/.config/mako
-rm -f ~/.config/mako/config
-ln -s ~/.cache/wal/mako ~/.config/mako/config
+# Enlace simbólico para la configuración raíz de ZSH
+if [ -f "$HOME/dotfiles/zsh/.config/zsh/.zshrc" ]; then
+  echo " -> Enlazando .zshrc al home..."
+  rm -f "$HOME/.zshrc"
+  ln -s "$HOME/dotfiles/zsh/.config/zsh/.zshrc" "$HOME/.zshrc"
+fi
 
 echo "4/5 Dando permisos y configurando el sistema por defecto..."
 # Permisos a tus scripts

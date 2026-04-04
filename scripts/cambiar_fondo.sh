@@ -13,5 +13,5 @@ wal -q -i "$IMAGEN"
 killall waybar
 hyprctl dispatch exec waybar
 
-# 4. Recargamos los colores de las notificaciones flotantes
-makoctl reload
+# 4. Recargamos los colores de las notificaciones
+swaync-client -rs

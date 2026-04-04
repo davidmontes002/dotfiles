@@ -55,7 +55,7 @@ window#waybar {
 }
 
 /* --- ESTILO ABAJO (LOS AZULEJOS) --- */
-#pulseaudio, #network, #clock, #temperature, #cpu, #memory, #battery {
+#custom-swaync, #pulseaudio, #network, #clock, #temperature, #cpu, #memory, #battery {
     padding: 8px 0;
     margin: 3px 4px;
     background-color: rgba(255, 255, 255, 0.08);
