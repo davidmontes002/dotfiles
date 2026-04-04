@@ -7,7 +7,7 @@
     // Módulos divididos por secciones
     "modules-left": ["custom/arch", "hyprland/workspaces", "tray"],
     "modules-center": ["custom/desktop"],
-    "modules-right": ["pulseaudio", "clock", "temperature", "cpu", "memory","battery"],
+    "modules-right": ["pulseaudio","network", "clock", "temperature", "cpu", "memory","battery"],
 
     // --- ARRIBA ---
     "custom/arch": {
@@ -44,6 +44,13 @@
         "scroll-step": 5,
         "justify": "center",
         "tooltip-format": "{volume}%"
+    },
+    "network": {
+        "format-wifi": "\n{signalStrength}%",
+        "format-ethernet": "󰈀\nLAN",
+        "format-disconnected": "󰤮\nOFF",
+        "tooltip-format": "Red: {essid}\nIP: {ipaddr}",
+        "justify": "center"
     },
 
     "clock": {

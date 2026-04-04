@@ -55,7 +55,7 @@ window#waybar {
 }
 
 /* --- ESTILO ABAJO (LOS AZULEJOS) --- */
-#pulseaudio, #clock, #temperature, #cpu, #memory, #battery {
+#pulseaudio, #network, #clock, #temperature, #cpu, #memory, #battery {
     padding: 8px 0;
     margin: 3px 4px;
     background-color: rgba(255, 255, 255, 0.08);
@@ -70,12 +70,13 @@ window#waybar {
     font-size: 15px; 
 }
 
+#network { color: @color7; }
 #clock { color: @color6; }
 #temperature { color: @color3; }
 #cpu { color: @color1; }
 #memory { color: @color2; }
 
 /* Efecto visual al pasar el mouse por los sensores */
-#pulseaudio:hover, #cpu:hover, #memory:hover {
+#pulseaudio:hover, #network:hover, #cpu:hover, #memory:hover {
     background-color: rgba(255, 255, 255, 0.15);
 }
