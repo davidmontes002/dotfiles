@@ -15,3 +15,8 @@ hyprctl dispatch exec waybar
 
 # 4. Recargamos los colores de las notificaciones
 swaync-client -rs
+
+# 5. SINCRONIZAR SDDM: Copiamos la nueva imagen a la pantalla de inicio
+if [ -f /usr/share/sddm/themes/corners/background.jpg ]; then
+  cp "$IMAGEN" /usr/share/sddm/themes/corners/background.jpg
+fi
