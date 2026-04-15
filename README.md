@@ -81,17 +81,6 @@ Luego edita la línea correspondiente en la config:
 }
 ```
 
-### Ruta de colores en SwayNC
-
-El archivo `swaync/.config/swaync/style.css` tiene una ruta de usuario que debes actualizar a la tuya:
-
-```bash
-# Reemplaza "cimi" por tu nombre de usuario real
-sed -i "s|/home/cimi/|/home/$USER/|g" ~/.config/swaync/style.css
-```
-
-O simplemente edita la primera línea del archivo manualmente.
-
 ---
 
 ## 🐛 Solución de Problemas
