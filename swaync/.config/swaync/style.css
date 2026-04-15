@@ -1,4 +1,4 @@
-@import url("/home/cimi/.cache/wal/colors-waybar.css");
+@import url("../../.cache/wal/colors-waybar.css");
 
 .control-center {
     background-color: alpha(@background, 0.85);
