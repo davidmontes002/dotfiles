@@ -1,4 +1,3 @@
-# --- CONFIGURACIÓN DE PERSONALIDAD DE TU DOTFILES ---
 
 # 1. Importar los colores dinámicos de Pywal (Vital para la estética)
 if [ -f ~/.cache/wal/colors.sh ]; then

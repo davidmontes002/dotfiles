@@ -81,10 +81,6 @@ if [ -f "$FONDO_INICIAL" ]; then
   wal -q -i "$FONDO_INICIAL"
 fi
 
-if [ -f "$HOME/dotfiles/scripts/install_sddm.sh" ]; then
-  "$HOME/dotfiles/scripts/install_sddm.sh"
-fi
-
 echo "======================================================="
 echo "INSTALACIÓN COMPLETADA CON ÉXITO!"
 echo "Tus iconos, audio y entorno Wayland están listos."
