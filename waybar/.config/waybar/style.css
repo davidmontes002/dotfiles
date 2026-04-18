@@ -1,57 +1,44 @@
 /*------------Importing Matugen Colors---------------*/
 @import "../../.cache/colors/waybar.css";
+
 /*------------Global Properties-----------------*/
 * {
     border: none;
     border-radius: 0px;
-    font-family: "Nunito", "Nerd Font";
-    font-size: 11px;
+    font-family: "Hack Nerd Font", "sans-serif";
+    font-size: 13px;
     min-height: 0;
 }
 
-/*------------Window--------------------*/
-#window{
-    background: @surface;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    font-weight: normal;
-    font-style: normal;
-}
-
-/*----------Waybar Window------------*/
 window#waybar {
-    /*background: @background-rgba; */
-    background: rgba(0, 0, 0, 0);
+    background: rgba(0, 0, 0, 0); /* Totalmente transparente */
 }
 
-/*-----------Tooltip--------------*/
+/*--------- Tooltip ---------*/
 tooltip {
-  background: @surface;
-  border: 1px solid @tertiary;
-  border-radius: 12px;
+    background: @surface;
+    border: 2px solid @primary;
+    border-radius: 12px;
 }
 tooltip label {
-  color: @on_surface;
-  padding: 6px;
+    color: @on_surface;
+    padding: 6px;
 }
 
-/*---------Workspaces-----------------*/
+/*--------- Workspaces ---------*/
 #workspaces {
     background: @surface;
-    margin: 5px 5px;
-    padding: 5px 3px;
+    margin: 4px 4px;
+    padding: 2px 6px;
     border-radius: 16px;
-    color: @on_surface;
 }
+
 #workspaces button {
     font-weight: bold;
-    padding: 0px 2px;
-    margin: 0px 3px;
+    padding: 2px 10px;
+    margin: 0px 4px;
     border-radius: 16px;
-    color: transparent;
+    color: @on_surface;
     background: @surface_container_highest;
     transition: all 0.3s ease-in-out;
 }
@@ -59,123 +46,42 @@ tooltip label {
 #workspaces button.active {
     font-weight: bold;
     background-color: @primary;
-    color: @scrim;
-    border-radius: 16px;
-    min-width: 40px;
-    background-size: 400% 400%;
-    transition: all 0.3s ease-in-out;
+    color: @background;
 }
 
 #workspaces button:hover {
-    font-weight: bold;
     background-color: @tertiary;
-    color: @scrim;
+    color: @background;
+}
+
+/*--------- Píldoras Centrales y Hardware ---------*/
+#custom-arch, #custom-desktop, #temperature, #cpu, #memory, #battery, #clock, #custom-swaync, #tray {
+    background: @surface;
+    color: @on_surface;
     border-radius: 16px;
-    min-width: 40px;
-    background-size: 400% 400%;
-}
-
-#workspaces button.urgent {
-    font-weight: bold;
-    background-color: @error;
-    color: @scrim;
-    border-radius: 16px;
-    min-width: 50px;
-    background-size: 400% 400%;
-    transition: all 0.3s ease-in-out;
-}
-
-
-/*---------------Tray, Clock, Playerctl, Battery, Cpu, Temperature, Colorpicker, Memory, Idle_inhibitor----------------------*/
-#tray, #pulseaudio, #network, #battery, #cpu, #temperature, #custom-colorpicker, #memory, #custom-pacman, #idle_inhibitor,
-#custom-playerctl.backward, #custom-notification, #clock, #custom-playerctl.play, #custom-playerctl.foward{
-    background: @surface;
-    font-weight: bold;
-    margin: 5px 0px;
-}
-#tray, #pulseaudio, #network, #battery, #clock, #custom-notification {
-    color: @on_surface;
-    border-radius: 10px 24px 10px 24px;
-    padding: 0 20px;
-    margin-left: 7px;
-}
-
-#network {
-    margin-right: 8px;
-}
-
-#custom-control_center {
-    color: @on_tertiary_container;
-    background: @surface;
-    border-radius: 0px 0px 0px 40px;
-    padding: 0px 15px 0px 22px;
-    margin: 0px 0px 0px 2px;
-    font-size: 20px;
-}
-
-
-
-
-
-#tray menu * {
-    padding: 0px 5px;
-    transition: all .3s ease; 
-}
-
-#tray menu separator {
-    padding: 0px 5px;
-    transition: all .3s ease; 
-}
-
-#custom-notification {
-    font-size: 14px;
-}
-
-#custom-notification sup {
-    font-size: 20px;
-}
-
-
-/*-----------Playerctl-------------------*/
-#custom-playerctl.backward, #custom-playerctl.play, #custom-playerctl.foward {
-    background: @surface;
-    font-size: 22px;
-}
-#custom-playerctl.backward:hover, #custom-playerctl.play:hover, #custom-playerctl.foward:hover{
-    color: @on_surface;
-}
-#custom-playerctl.backward {
-    color: @tertiary;
-    border-radius: 24px 0px 0px 10px;
-    padding-left: 16px;
-    margin-left: 7px;
-}
-#custom-playerctl.play {
-    color: @on_primary_fixed_variant;
-    padding: 0 5px;
-}
-#custom-playerctl.foward {
-    color: @tertiary;
-    border-radius: 0px 10px 24px 0px;
-    padding-right: 12px;
-    margin-right: 7px
-}
-#custom-playerlabel {
-    background: @surface;
-    color: @on_surface;
-    padding: 0 20px;
-    border-radius: 24px 10px 24px 10px;
-    margin: 5px 0;
+    padding: 2px 14px; /* Relleno horizontal */
+    margin: 4px 4px;   /* Separación del borde superior y entre módulos */
     font-weight: bold;
 }
 
-/*-------------Launcher--------------*/
-#custom-launcher {
-    color: @on_tertiary_container;
-    background: @surface;
-    margin: 0px 0px 0px 0px;
-    padding: 0px 25px 4px 10px;
-    border-radius: 0px 0px 40px 0px;
-    font-size: 24px;
+/* Ajustes especiales de color */
+#custom-arch {
+    color: @primary;
+    font-size: 16px;
+    padding: 2px 18px;
 }
 
+#custom-desktop {
+    color: @primary;
+}
+
+/* Alertas de Batería */
+#battery.warning {
+    color: @surface;
+    background: @tertiary;
+}
+
+#battery.critical {
+    color: @surface;
+    background: @error;
+}

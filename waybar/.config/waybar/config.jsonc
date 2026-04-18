@@ -1,24 +1,22 @@
 {
     "layer": "top",
-    "position": "left",
-    "width": 50,
+    "position": "top",
+    "height": 36,
     "spacing": 4,
     
-    // Módulos divididos por secciones
-    "modules-left": ["custom/arch", "hyprland/workspaces", "tray"],
-    "modules-center": ["custom/desktop"],
+    "modules-left": ["custom/arch", "hyprland/workspaces", "custom/desktop"],
+    "modules-center": ["clock"],
     "modules-right": [
-    "temperature", 
-    "cpu", 
-    "memory", 
-    "battery", 
-    "clock",
-    "custom/swaync" // La campanita al final
+        "tray",
+        "temperature", 
+        "cpu", 
+        "memory", 
+        "battery", 
+        "custom/swaync"
     ],
 
-    // --- ARRIBA ---
     "custom/arch": {
-        "format": "",
+        "format": " ",
         "tooltip": false
     },
 
@@ -34,67 +32,43 @@
         "spacing": 8
     },
 
-    // --- CENTRO ---
     "custom/desktop": {
-        "format": "\n D\n S\n K\n T\n O\n P",
-        "justify": "center"
-    },
-
-    // --- ABAJO ---
-    "pulseaudio": {
-        "format": "{icon}",
-        "format-muted": "󰝟",
-        "format-icons": {
-            "default": ["󰕿", "󰖀", "󰕾"]
-        },
-        "on-click": "pavucontrol",
-        "scroll-step": 5,
-        "justify": "center",
-        "tooltip-format": "{volume}%"
-    },
-    "network": {
-        "format-wifi": "\n{signalStrength}%",
-        "format-ethernet": "󰈀\nLAN",
-        "format-disconnected": "󰤮\nOFF",
-        "tooltip-format": "Red: {essid}\nIP: {ipaddr}",
-        "justify": "center"
+        "format": " DESKTOP"
     },
 
     "clock": {
-        "format": "{:%H\n%M}",
-        "justify": "center",
+        "format": " {:%H:%M}",
         "tooltip-format": "<tt><small>{calendar}</small></tt>"
     },
+
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
         "critical-threshold": 80,
-        "format": "\n{temperatureC}°",
-        "justify": "center"
+        "format": " {temperatureC}°C"
     },
+
     "cpu": {
-        "format": "\n{usage}%",
-        "justify": "center"
+        "format": " {usage}%"
     },
 
     "memory": {
-        "format": "󰍛\n{percentage}%",
-        "justify": "center"
+        "format": "󰍛 {percentage}%"
     },
+
     "battery": {
         "states": {
             "warning": 30,
             "critical": 15
         },
-        "format": "{icon}\n{capacity}%",
-        "format-charging": "󰂄\n{capacity}%",
-        "format-plugged": "\n{capacity}%",
-        "format-icons": ["", "", "", "", ""],
-        "justify": "center"
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-icons": ["", "", "", "", ""]
     },
+
     "custom/swaync": {
         "format": "",
         "on-click": "swaync-client -t -sw",
-        "tooltip": false,
-        "justify": "center"
+        "tooltip": false
     }
 }
