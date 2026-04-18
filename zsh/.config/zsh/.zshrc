@@ -1,9 +1,3 @@
-
-# 1. Importar los colores dinámicos de Pywal (Vital para la estética)
-if [ -f ~/.cache/wal/colors.sh ]; then
-    source ~/.cache/wal/colors.sh
-fi
-
 # 2. Configuración básica de ZSH (Historial, Completado, etc.)
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -20,7 +14,7 @@ alias gs='git status'
 alias update='yay -Syu'
 
 # 3. CONTENIDO DE INICIO (Lo que querías ver al arrancar)
-# Limpiamos la pantalla y lanzamos Fastfetch usando los colores de Pywal
+# Limpiamos la pantalla y lanzamos Fastfetch
 clear
 # Puedes probar cambiándolo por: fastfetch --logo arch (u otro logo)
 fastfetch

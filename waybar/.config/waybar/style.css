@@ -1,6 +1,5 @@
 /*------------Importing Matugen Colors---------------*/
-@import "/home/cimi/.cache/colors/waybar.css";
-
+@import "../../.cache/colors/waybar.css";
 /*------------Global Properties-----------------*/
 * {
     border: none;
