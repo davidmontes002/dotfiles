@@ -1,0 +1,20 @@
+[config.wallpaper]
+command = "swww"
+arguments = ["img", "--transition-type", "outer", "--transition-pos", "0.854,0.977", "--transition-step", "90"]
+set = false
+
+[templates.waybar]
+input_path = '/home/cimi/.config/matugen/templates/waybar.css'
+output_path = '/home/cimi/.cache/colors/waybar.css'
+
+[templates.eww]
+input_path = '/home/cimi/.config/matugen/templates/eww.scss'
+output_path = '/home/cimi/.cache/colors/eww.scss'
+
+[templates.rofi]
+input_path = '/home/cimi/.config/matugen/templates/rofi.rasi'
+output_path = '/home/cimi/.cache/colors/rofi.rasi'
+
+[templates.kitty]
+input_path = '/home/cimi/.config/matugen/templates/kitty.conf'
+output_path = '/home/cimi/.cache/colors/kitty.conf'

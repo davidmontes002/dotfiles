@@ -14,7 +14,7 @@ element-icon { size: 180px; horizontal-align: 0.5; }
 element-text { horizontal-align: 0.5; margin: 10px 0 0 0; }
 ')
 
-# Si seleccionaste una imagen, ejecutamos el motor
+# Si seleccionaste una imagen, ejecutamos el motor en modo "desconectado"
 if [ -n "$ELEGIDO" ]; then
-    ~/dotfiles/scripts/cambiar_fondo.sh "$DIR/$ELEGIDO"
+    nohup bash "$HOME/dotfiles/scripts/cambiar_fondo.sh" "$DIR/$ELEGIDO" >/dev/null 2>&1 &
 fi
