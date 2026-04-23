@@ -1,0 +1,7 @@
+@mixin window {
+    background-color: rgba($surface_dim, 0.92);
+    border-radius: 1rem;
+    padding: 1rem;
+    color: $on_surface;
+    margin: 0.4rem;
+}

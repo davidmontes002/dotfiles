@@ -1,0 +1,55 @@
+(defwidget powermenu_entry [label icon onclick]
+    (box 
+        :orientation "v" 
+        :space-evenly false 
+        :class "powermenu-entry"
+        (button 
+            :class "powermenu-button" 
+            :onclick onclick
+            (label :class "powermenu-icon" :text icon))
+        (label :class "powermenu-text" :text label)
+    )
+)
+
+(defwidget powermenu []
+    (box 
+        :orientation "v"
+        :space-evenly false
+        :class "powermenu-box"
+        (label
+            :class "powermenu-user"
+            :text "Hola, ${rawuser} 👋")
+        (box
+            :orientation "h" 
+            :space-evenly true 
+            :valign "center" 
+            :halign "center"
+            :spacing 10
+            :class "powermenu-buttons"
+            (powermenu_entry    
+                :label "Apagar" 
+                :icon "󰐥" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh poweroff &")
+            (powermenu_entry    
+                :label "Reiniciar" 
+                :icon "󰜉" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh reboot &")
+            (powermenu_entry    
+                :label "Bloquear" 
+                :icon "" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh lock &")
+            (powermenu_entry    
+                :label "Suspender" 
+                :icon "󰤄" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh suspend &")
+            (powermenu_entry    
+                :label "Cerrar sesión"
+                :icon "󰗼" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh logout &")
+            (powermenu_entry    
+                :label "Cancelar" 
+                :icon "󰅖" 
+                :onclick "~/.config/eww/scripts/power/powervalidate.sh cancel &")
+        )
+    )
+)

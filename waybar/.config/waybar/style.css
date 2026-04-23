@@ -5,13 +5,13 @@
 * {
     border: none;
     border-radius: 0px;
-    font-family: "Hack Nerd Font", "sans-serif";
+    font-family: "Hack Nerd Font", "Symbols Nerd Font", sans-serif;
     font-size: 13px;
     min-height: 0;
 }
 
 window#waybar {
-    background: rgba(0, 0, 0, 0); /* Totalmente transparente */
+    background: rgba(0, 0, 0, 0);
 }
 
 /*--------- Tooltip ---------*/
@@ -54,28 +54,69 @@ tooltip label {
     color: @background;
 }
 
-/*--------- Píldoras Centrales y Hardware ---------*/
-#custom-arch, #custom-desktop, #temperature, #cpu, #memory, #battery, #clock, #custom-swaync, #tray {
+/*--------- Módulos ---------*/
+#custom-arch,
+#custom-desktop,
+#custom-network,
+#temperature,
+#cpu,
+#memory,
+#battery,
+#clock,
+#tray,
+#custom-notifications,
+#custom-powermenu {
     background: @surface;
     color: @on_surface;
     border-radius: 16px;
-    padding: 2px 14px; /* Relleno horizontal */
-    margin: 4px 4px;   /* Separación del borde superior y entre módulos */
+    padding: 2px 14px;
+    margin: 4px 4px;
     font-weight: bold;
 }
 
-/* Ajustes especiales de color */
 #custom-arch {
     color: @primary;
-    font-size: 16px;
-    padding: 2px 18px;
+    font-size: 18px;
+    padding: 2px 14px;
 }
 
 #custom-desktop {
     color: @primary;
 }
 
-/* Alertas de Batería */
+#custom-network {
+    color: @tertiary;
+    font-size: 11px;
+}
+
+#temperature {
+    color: @error;
+}
+
+#temperature.critical {
+    color: @surface;
+    background: @error;
+}
+
+#cpu {
+    color: @primary;
+}
+
+#memory {
+    color: @secondary;
+}
+
+#custom-notifications {
+    color: @primary;
+    font-size: 16px;
+}
+
+#custom-powermenu {
+    color: @error;
+    font-size: 16px;
+}
+
+/*--------- Alertas de Batería ---------*/
 #battery.warning {
     color: @surface;
     background: @tertiary;

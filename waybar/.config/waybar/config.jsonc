@@ -3,22 +3,19 @@
     "position": "top",
     "height": 36,
     "spacing": 4,
-    
+
     "modules-left": ["custom/arch", "hyprland/workspaces", "custom/desktop"],
     "modules-center": ["clock"],
     "modules-right": [
         "tray",
-        "temperature", 
-        "cpu", 
-        "memory", 
-        "battery", 
-        "custom/swaync"
+        "custom/network",
+        "temperature",
+        "cpu",
+        "memory",
+        "battery",
+        "custom/notifications",
+        "custom/powermenu"
     ],
-
-    "custom/arch": {
-        "format": " ",
-        "tooltip": false
-    },
 
     "hyprland/workspaces": {
         "format": "{name}",
@@ -27,35 +24,46 @@
         "all-outputs": true
     },
 
+    "custom/desktop": {
+        "format": " DESKTOP",
+        "tooltip": false
+    },
+
     "tray": {
         "icon-size": 16,
         "spacing": 8
     },
 
-    "custom/desktop": {
-        "format": " DESKTOP"
+    "clock": {
+        "format": " {:%H:%M}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>"
     },
 
-    "clock": {
-        "format": " {:%H:%M}",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>"
+    "custom/network": {
+        "exec": "~/.config/eww/scripts/eww/network.sh",
+        "interval": 3,
+        "format": "{}",
+        "tooltip": false
     },
 
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
         "critical-threshold": 80,
-        "format": " {temperatureC}°C"
+        "format": "󰔏 {temperatureC}°C"
     },
 
     "cpu": {
-        "format": " {usage}%"
+        "format": "󰘚 {usage}%",
+        "interval": 3,
+        "tooltip": false
     },
 
     "memory": {
-        "format": "󰍛 {percentage}%"
+        "format": "󰍛 {percentage}%",
+        "tooltip": false
     },
 
-    "battery": {
+     "battery": {
         "states": {
             "warning": 30,
             "critical": 15
@@ -64,11 +72,23 @@
         "format-charging": "󰂄 {capacity}%",
         "format-plugged": " {capacity}%",
         "format-icons": ["", "", "", "", ""]
+    },   
+
+
+    "custom/arch": {
+        "format": "󰣇",
+        "tooltip": false
     },
 
-    "custom/swaync": {
-        "format": "",
-        "on-click": "swaync-client -t -sw",
+    "custom/notifications": {
+        "format": "󰂚",
+        "on-click": "~/.config/eww/scripts/eww/control_center.sh --toggle",
+        "tooltip": false
+    },
+
+    "custom/powermenu": {
+        "format": "󰐥",
+        "on-click": "~/.config/eww/scripts/power/powermenu.sh &",
         "tooltip": false
     }
 }

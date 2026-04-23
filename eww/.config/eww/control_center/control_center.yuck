@@ -1,0 +1,60 @@
+(defwidget control_center []
+    (revealer 
+        :transition "slideup" 
+        :reveal {show_control_center} 
+        :duration {ANIM_DURATION}
+        (box 
+            :orientation "v" 
+            :space-evenly false
+            :spacing 10
+            :class "control-center-box"
+            (user_card)
+            (charts)
+            (volume_control)
+            (network_info)
+            (notifications_center)
+        )
+    )
+)
+
+(defwidget user_card []
+    (box 
+        :orientation "h" 
+        :space-evenly false
+        :class "user-card"
+        :spacing 15
+        (box 
+            :class "user-image"
+            :orientation "v")
+        (box 
+            :orientation "v"
+            :space-evenly false
+            :valign "center"
+            :spacing 3
+            (label 
+                :class "username" 
+                :halign "start"
+                :text "${rawuser}")
+            (label 
+                :class "uptime-label"
+                :halign "start"
+                :text "${uptime}")
+        )
+        (box :hexpand true)
+        (button
+            :class "powermenu-btn"
+            :onclick "~/.config/eww/scripts/power/powermenu.sh &"
+            "󰐥")
+    )
+)
+
+(defwidget network_info []
+    (box
+        :orientation "h"
+        :space-evenly true
+        :class "network-box"
+        (label
+            :class "network-speed"
+            :text "${network}")
+    )
+)

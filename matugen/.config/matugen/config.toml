@@ -22,3 +22,4 @@ output_path = '~/.cache/colors/kitty.conf'
 [templates.hyprland]
 input_path = './templates/colors-hyprland.conf'
 output_path = '~/.cache/colors/colors-hyprland.conf'
+

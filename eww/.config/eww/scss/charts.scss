@@ -1,0 +1,46 @@
+.chartsbox {
+    margin: 0.4rem 0;
+}
+
+.chart-container {
+    background-color: rgba($surface_container_low, 0.9);
+    border-radius: 12px;
+    padding: 8px;
+
+    .label-title {
+        font-size: 0.75rem;
+        color: $on_surface_variant;
+        padding: 4px 0 0 8px;
+    }
+
+    .body .container {
+        padding: 6px;
+
+        .chart-inner {
+            background-color: $surface_container_lowest;
+            border-radius: 3em;
+
+            .chart {
+                color: $inverse_primary;
+                background-color: rgba($surface_container_high, 0.8);
+
+                label {
+                    padding: 1.5em;
+                    font-size: 20px;
+                }
+            }
+
+            .chart-icon {
+                background-color: $surface_container_low;
+                border-radius: 3em;
+                font-size: 22px;
+                margin: 0.5em;
+
+                &.cpu { padding: 0 10px 0 0; }
+                &.ram { padding: 0 3px 0 0; }
+                &.temp { padding: 0 10px 0 0; }
+                &.disk { padding: 0; }
+            }
+        }
+    }
+}

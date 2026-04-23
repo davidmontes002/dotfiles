@@ -1,0 +1,21 @@
+* {
+    all: unset;
+    font-family: "JetBrains Mono Nerd Font", "Nerd Font";
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+.bg-panel-container {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+@import "../../.cache/colors/eww.scss";
+@import "scss/lib.scss";
+@import "scss/control_center.scss";
+@import "scss/charts.scss";
+@import "scss/volume.scss";
+@import "scss/notifications.scss";
+@import "scss/notifications_popup.scss";
+@import "scss/powermenu.scss";

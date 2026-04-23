@@ -27,4 +27,9 @@ touch "$HOME/.config/kitty/kitty.conf"
 pkill -USR1 kitty >>$LOG 2>&1
 swaync-client -rs >>$LOG 2>&1
 
+# 5. Guardar referencia del wallpaper para hyprlock
+mkdir -p "$HOME/.cache/hyprlock"
+cp "$IMAGEN" "$HOME/.cache/hyprlock/wallpaper.jpg"
+echo "\$wallpaper = $HOME/.cache/hyprlock/wallpaper.jpg" > "$HOME/.cache/hyprlock/wallpaper.conf"
+
 echo "=== FIN ===" >>$LOG

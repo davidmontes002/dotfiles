@@ -1,0 +1,58 @@
+.control-center-box {
+    @include window;
+    border-radius: 20px 10px 20px 10px;
+    min-width: 400px;
+    padding: 1.2rem;
+}
+
+.user-card {
+    background-color: rgba($surface_container, 0.8);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 0.5rem;
+
+    .username {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: $on_surface;
+    }
+
+    .uptime-label {
+        font-size: 0.85rem;
+        color: $on_surface_variant;
+    }
+
+    .user-image {
+        background-image: url("images/user.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        min-height: 48px;
+        min-width: 48px;
+        border-radius: 50%;
+    }
+
+    .powermenu-btn {
+        background-color: $on_background;
+        font-size: 1.4rem;
+        color: $surface;
+        border-radius: 10px;
+        padding: 0 12px;
+        transition: 0.3s;
+
+        &:hover {
+            background-color: mix($inverse_primary, $on_background, 70%);
+        }
+    }
+}
+
+.network-box {
+    background-color: rgba($surface_container, 0.6);
+    border-radius: 10px;
+    padding: 8px 12px;
+
+    .network-speed {
+        font-size: 0.9rem;
+        color: $on_surface_variant;
+    }
+}
