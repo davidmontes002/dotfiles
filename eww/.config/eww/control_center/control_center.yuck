@@ -6,12 +6,10 @@
         (box 
             :orientation "v" 
             :space-evenly false
-            :spacing 10
+            :spacing 12
             :class "control-center-box"
             (user_card)
-            (charts)
-            (volume_control)
-            (network_info)
+            (controls_section)
             (notifications_center)
         )
     )
@@ -22,7 +20,7 @@
         :orientation "h" 
         :space-evenly false
         :class "user-card"
-        :spacing 15
+        :spacing 16
         (box 
             :class "user-image"
             :orientation "v")
@@ -30,7 +28,7 @@
             :orientation "v"
             :space-evenly false
             :valign "center"
-            :spacing 3
+            :spacing 4
             (label 
                 :class "username" 
                 :halign "start"
@@ -44,7 +42,37 @@
         (button
             :class "powermenu-btn"
             :onclick "~/.config/eww/scripts/power/powermenu.sh &"
-            "󰐥")
+            "⏻")
+    )
+)
+
+(defwidget controls_section []
+    (box
+        :orientation "v"
+        :spacing 10
+        :class "controls-grid"
+        (volume_control)
+        (brightness_control)
+    )
+)
+
+(defwidget brightness_control []
+    (box
+        :orientation "h"
+        :space-evenly false
+        :class "control-row"
+        (label 
+            :class "control-icon"
+            :text "")
+        (scale 
+            :class "control-slider"
+            :min 0 
+            :max 100 
+            :value 70
+            :onchange "brightnessctl set {}%")
+        (label
+            :class "control-value"
+            :text "70%")
     )
 )
 
@@ -53,8 +81,17 @@
         :orientation "h"
         :space-evenly true
         :class "network-box"
+        (box
+            :orientation "h"
+            :spacing 12
+            :class "network-info"
+            (label :class "network-icon" :text "直")
+            (label
+                :class "network-speed"
+                :text "${network}")
+        )
         (label
-            :class "network-speed"
-            :text "${network}")
+            :class "network-status"
+            :text "Conectado")
     )
 )

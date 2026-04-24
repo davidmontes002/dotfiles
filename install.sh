@@ -10,11 +10,12 @@ PAQUETES=(
   "hyprland" "hyprlock" "kitty" "rofi-wayland" "waybar" "matugen" "awww"
   "libnotify" "thunar" "materia-gtk-theme" "papirus-icon-theme"
 
-  # --- EWW Y DEPENDENCIAS ---
-  "eww" "python-dbus" "python-gobject" "python-pillow" "jq" "zenity"
+  # --- AGS (Aylur's GTK Shell) Y DEPENDENCIAS ---
+  "aylurs-gtk-shell" "jq" "zenity" "brightnessctl" "dart-sass"
 
   # --- FUENTES E ICONOS ---
   "ttf-hack-nerd" "ttf-jetbrains-mono-nerd" "ttf-nerd-fonts-symbols"
+  "ttf-fredoka" "otf-font-awesome"
 
   # --- AUDIO (PipeWire) Y MULTIMEDIA ---
   "pipewire" "pipewire-pulse" "wireplumber" "pavucontrol" "playerctl"
@@ -35,16 +36,26 @@ PAQUETES=(
   "starship"
 )
 
-echo "1/6 Instalando todos los paquetes y dependencias..."
-yay -S --needed --noconfirm "${PAQUETES[@]}"
+# 2. Paquetes AUR adicionales (temario e iconos)
+AUR_PAQUETES=(
+  "magna-dark-icons"
+  "lavanda-gtk-theme"
+  "ttf-fredoka-one"
+)
 
-echo "2/6 Preparando la estructura de directorios..."
+echo "1/7 Instalando todos los paquetes y dependencias..."
+yay -S --needed --noconfirm "${PAQUETES[@]}"
+yay -S --needed --noconfirm "${AUR_PAQUETES[@]}"
+
+echo "2/7 Preparando la estructura de directorios..."
 mkdir -p ~/.config
 mkdir -p ~/.cache/colors
 mkdir -p ~/.cache/hyprlock
+mkdir -p ~/.cache/albumart
+mkdir -p ~/.cache/liveWallpaper
 mkdir -p ~/.cache/notify_img_data
 
-echo "3/6 Creando los enlaces simbólicos..."
+echo "3/7 Creando los enlaces simbólicos..."
 APPS=("hypr" "kitty" "rofi" "waybar" "matugen" "zsh")
 
 for app in "${APPS[@]}"; do
@@ -69,27 +80,45 @@ if [ -f "$HOME/dotfiles/zsh/.config/zsh/.zshrc" ]; then
   ln -s "$HOME/dotfiles/zsh/.config/zsh/.zshrc" "$HOME/.zshrc"
 fi
 
-# EWW — symlink especial
-echo " -> Enlazando eww..."
-rm -rf "$HOME/.config/eww"
-ln -s "$HOME/dotfiles/eww/.config/eww" "$HOME/.config/eww"
+# EWW — symlink (mantener como backup)
+if [ -d "$HOME/dotfiles/eww/.config/eww" ]; then
+  echo " -> Enlazando eww (backup)..."
+  rm -rf "$HOME/.config/eww"
+  ln -s "$HOME/dotfiles/eww/.config/eww" "$HOME/.config/eww"
+fi
+
+# AGS — symlink principal
+if [ -d "$HOME/dotfiles/ags/.config/ags" ]; then
+  echo " -> Enlazando ags..."
+  rm -rf "$HOME/.config/ags"
+  ln -s "$HOME/dotfiles/ags/.config/ags" "$HOME/.config/ags"
+fi
 
 # Cava symlink para config generado por Matugen
 mkdir -p "$HOME/.config/cava"
 rm -f "$HOME/.config/cava/config"
 ln -s "$HOME/.cache/colors/cava.ini" "$HOME/.config/cava/config" 2>/dev/null || true
 
-echo "4/6 Dando permisos a los scripts..."
+echo "4/7 Dando permisos a los scripts..."
 if [ -d "$HOME/dotfiles/scripts" ]; then
   chmod +x "$HOME/dotfiles/scripts/"*.sh
 fi
-chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/eww/"*.sh
-chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/charts/"*.sh
-chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/power/"*.sh
-chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/notifications/"*.sh
-chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/daemon_notify/notifications.py"
 
-echo "5/6 Configurando el sistema..."
+# Scripts EWW (backup)
+if [ -d "$HOME/dotfiles/eww/.config/eww/scripts" ]; then
+  chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/eww/"*.sh
+  chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/charts/"*.sh
+  chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/power/"*.sh
+  chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/notifications/"*.sh
+  chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/daemon_notify/notifications.py"
+fi
+
+# Scripts AGS
+if [ -d "$HOME/dotfiles/ags/.config/ags/scripts" ]; then
+  chmod +x "$HOME/dotfiles/ags/.config/ags/scripts/"*.sh
+fi
+
+echo "5/7 Configurando el sistema..."
 # Shell por defecto a ZSH
 echo " -> Cambiando shell a ZSH..."
 chsh -s $(which zsh)
@@ -107,12 +136,15 @@ fi
 echo " -> Detectando interfaz de red..."
 INTERFACE=$(ip route | grep default | awk '{print $5}' | head -n1)
 if [ -n "$INTERFACE" ]; then
-  sed -i "s|INTERFACE=\"wlan0\"|INTERFACE=\"$INTERFACE\"|g" \
-    "$HOME/dotfiles/eww/.config/eww/scripts/eww/network.sh"
+  # Actualizar en EWW (backup)
+  if [ -f "$HOME/dotfiles/eww/.config/eww/scripts/eww/network.sh" ]; then
+    sed -i "s|INTERFACE=\"wlan0\"|INTERFACE=\"$INTERFACE\"|g" \
+      "$HOME/dotfiles/eww/.config/eww/scripts/eww/network.sh"
+  fi
   echo " -> Interfaz configurada: $INTERFACE"
 fi
 
-echo "6/6 Inicializando Matugen para el primer arranque..."
+echo "6/7 Inicializando Matugen para el primer arranque..."
 FONDO_INICIAL=$(find "$HOME/dotfiles/fondos" -type f \( -iname "*.jpg" -o -iname "*.png" \) | head -n 1)
 if [ -n "$FONDO_INICIAL" ]; then
   matugen image "$FONDO_INICIAL" -m dark --prefer saturation \
@@ -126,5 +158,12 @@ fi
 
 echo "======================================================="
 echo " INSTALACIÓN COMPLETADA"
+echo ""
+echo " Para usar EWW (backup): SUPER + A"
+echo " Para usar AGS (nuevo):"
+echo "   1. Edita ~/.config/hypr/hyprland.conf"
+echo "   2. Descomenta: exec-once = ags -r"
+echo "   3. Comenta las líneas de exec-once de eww"
+echo ""
 echo " Reinicia y escribe 'Hyprland' para entrar al entorno."
 echo "======================================================="

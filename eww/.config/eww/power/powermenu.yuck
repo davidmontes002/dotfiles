@@ -1,8 +1,8 @@
-(defwidget powermenu_entry [label icon onclick]
+(defwidget powermenu_entry [label icon onclick css_class]
     (box 
         :orientation "v" 
         :space-evenly false 
-        :class "powermenu-entry"
+        :class "powermenu-entry ${css_class}"
         (button 
             :class "powermenu-button" 
             :onclick onclick
@@ -15,41 +15,52 @@
     (box 
         :orientation "v"
         :space-evenly false
+        :halign "center"
         :class "powermenu-box"
-        (label
-            :class "powermenu-user"
-            :text "Hola, ${rawuser} 👋")
+        (box
+            :orientation "h"
+            :halign "center"
+            :class "powermenu-header"
+            (label
+                :class "powermenu-label"
+                :text "Power Menu")
+            (button
+                :class "powermenu-close"
+                :onclick "eww close powermenu"
+                "✕")
+        )
         (box
             :orientation "h" 
             :space-evenly true 
             :valign "center" 
             :halign "center"
-            :spacing 10
+            :spacing 16
             :class "powermenu-buttons"
             (powermenu_entry    
                 :label "Apagar" 
-                :icon "󰐥" 
+                :icon "⏻" 
+                :css_class "shutdown"
                 :onclick "~/.config/eww/scripts/power/powervalidate.sh poweroff &")
             (powermenu_entry    
                 :label "Reiniciar" 
-                :icon "󰜉" 
+                :icon "↻" 
+                :css_class "reboot"
                 :onclick "~/.config/eww/scripts/power/powervalidate.sh reboot &")
             (powermenu_entry    
                 :label "Bloquear" 
-                :icon "" 
+                :icon "🔒" 
+                :css_class "lock"
                 :onclick "~/.config/eww/scripts/power/powervalidate.sh lock &")
             (powermenu_entry    
                 :label "Suspender" 
-                :icon "󰤄" 
+                :icon "💤" 
+                :css_class "suspend"
                 :onclick "~/.config/eww/scripts/power/powervalidate.sh suspend &")
             (powermenu_entry    
-                :label "Cerrar sesión"
-                :icon "󰗼" 
+                :label "Logout"
+                :icon "🚪" 
+                :css_class "logout"
                 :onclick "~/.config/eww/scripts/power/powervalidate.sh logout &")
-            (powermenu_entry    
-                :label "Cancelar" 
-                :icon "󰅖" 
-                :onclick "~/.config/eww/scripts/power/powervalidate.sh cancel &")
         )
     )
 )

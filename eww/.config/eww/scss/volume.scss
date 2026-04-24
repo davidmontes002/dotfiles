@@ -1,38 +1,38 @@
 .volume-control-center {
-    background-color: rgba($surface_container, 0.6);
-    border-radius: 12px;
-    padding: 8px 12px;
+    @include card;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
     margin: 4px 0;
-}
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 3px solid $primary;
 
-.volume-scale trough {
-    background-color: $surface_variant;
-    border-radius: 1rem;
-    min-height: 2rem;
-}
+    .volume-icon {
+        @include icon-button;
+        font-size: 1.2rem;
+        color: $primary;
+        &:hover {
+            background-color: rgba($primary, 0.12);
+            color: $primary;
+        }
+    }
 
-.volume-scale trough highlight {
-    background-color: $primary_container;
-    border-radius: 1rem;
-}
+    .volume-scale {
+        @include scale-track;
+        flex: 1;
+    }
 
-.volume-icon {
-    font-size: 1.4rem;
-    margin-right: 8px;
-    color: $on_surface;
-}
-
-.volume-mute {
-    background-color: $surface_variant;
-    color: $on_surface;
-    font-size: 1.3rem;
-    min-width: 2rem;
-    border-radius: 2rem;
-    margin-left: 8px;
-    transition: 0.3s;
-
-    &.active {
-        background-color: $primary;
-        color: $surface;
+    .volume-mute {
+        @include icon-button;
+        font-size: 1rem;
+        &:hover {
+            background: rgba($error, 0.15);
+            color: $error;
+        }
+        &.active {
+            background: rgba($error, 0.15);
+            color: $error;
+        }
     }
 }

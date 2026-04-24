@@ -1,30 +1,100 @@
 .powermenu-box {
-    @include window;
-    border-radius: 16px;
-    padding: 24px;
+    @include frosted-glass;
+    padding: 32px;
+    border-radius: 28px;
+    min-width: 420px;
+}
+
+.powermenu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    .powermenu-label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $on_surface;
+    }
+    
+    .powermenu-close {
+        @include icon-button;
+        font-size: 1.2rem;
+        padding: 8px;
+        &:hover {
+            background: rgba($error, 0.15);
+            color: $error;
+        }
+    }
 }
 
 .powermenu-buttons {
     display: flex;
     gap: 12px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .powermenu-entry {
+    flex: 1;
+    min-width: 80px;
+    max-width: 100px;
     text-align: center;
+    
     .powermenu-button {
-        background-color: rgba($surface_container, 0.65);
-        border-radius: 12px;
-        padding: 16px;
-        transition: all 0.3s;
+        @include elevated;
+        width: 100%;
+        padding: 20px 16px;
+        border-radius: 20px;
+        border: 1px solid rgba($outline, 0.15);
+        transition: all 300ms ease;
+        cursor: pointer;
+        
         &:hover {
-            background: $primary;
-            color: $on_primary;
+            transform: translateY(-4px) scale(1.05);
+            border-color: rgba($primary, 0.4);
+            box-shadow: 0 12px 32px rgba($primary, 0.3), 0 0 0 2px rgba($primary, 0.15);
+            
+            .powermenu-icon {
+                color: $on_primary;
+                filter: drop-shadow(0 0 8px rgba($primary, 0.5));
+            }
+            .powermenu-text {
+                color: $on_primary;
+            }
+        }
+        
+        &:active {
+            transform: translateY(-2px) scale(1.02);
         }
     }
-    .powermenu-text {
-        font-size: 0.75rem;
-        color: $on_surface_variant;
-        margin-top: 4px;
+    
+    .powermenu-icon {
+        font-size: 2.2rem;
+        color: $primary;
+        display: block;
+        margin-bottom: 10px;
+        transition: all 300ms ease;
     }
+    
+    .powermenu-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $on_surface_variant;
+        transition: color 300ms ease;
+    }
+}
+
+.powermenu-entry.shutdown .powermenu-button:hover {
+    border-color: rgba($error, 0.4);
+    box-shadow: 0 12px 32px rgba($error, 0.3), 0 0 0 2px rgba($error, 0.15);
+    .powermenu-icon { color: $on_error; }
+    .powermenu-text { color: $on_error; }
+}
+
+.powermenu-entry.lock .powermenu-button:hover {
+    border-color: rgba($tertiary, 0.4);
+    box-shadow: 0 12px 32px rgba($tertiary, 0.3), 0 0 0 2px rgba($tertiary, 0.15);
+    .powermenu-icon { color: $on_tertiary; }
+    .powermenu-text { color: $on_tertiary; }
 }

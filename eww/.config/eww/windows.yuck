@@ -22,7 +22,8 @@
     :monitor 0
     :stacking "fg"
     :geometry (geometry
-                :anchor "center"
+                :anchor "top center"
+                :y 80
                 :width "500px"
                 :height "2px")
     :namespace "eww"

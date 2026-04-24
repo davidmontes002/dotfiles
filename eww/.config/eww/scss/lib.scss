@@ -114,3 +114,26 @@ $transition-normal: 300ms ease;
         &:hover { background: rgba($outline, 0.4); }
     }
 }
+
+@mixin elevated {
+    background: rgba($surface_container, 0.85);
+    border-radius: $radius-xl;
+    border: 1px solid rgba($outline, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+@mixin gradient-primary {
+    background: linear-gradient(135deg, $primary, $tertiary);
+    &:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 4px 20px rgba($primary, 0.4);
+    }
+}
+
+@mixin frosted-glass {
+    background: rgba($surface_dim, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: $radius-xl;
+    border: 1px solid rgba($outline, 0.12);
+}

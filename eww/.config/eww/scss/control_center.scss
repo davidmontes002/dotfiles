@@ -1,18 +1,19 @@
 .control-center-box {
-    @include window;
-    border-radius: $radius-lg;
-    min-width: 420px;
-    padding: $spacing-xl;
+    @include frosted-glass;
+    min-width: 380px;
+    padding: 24px;
+    border-radius: 24px;
 }
 
 .user-card {
-    @include glass;
-    border-radius: $radius-lg;
-    padding: $spacing-lg;
-    margin-bottom: $spacing-md;
+    @include elevated;
+    padding: 20px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
-    gap: $spacing-md;
+    gap: 16px;
+    border-radius: 20px;
+    border: 1px solid rgba($primary, 0.2);
 
     .user-image {
         background-image: url("images/user.png");
@@ -21,75 +22,112 @@
         background-position: center;
         min-height: 56px;
         min-width: 56px;
-        border-radius: $radius-full;
+        border-radius: 50%;
         border: 2px solid $primary;
     }
+
     .user-details {
         flex: 1;
         .username {
-            @include text-title;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $on_surface;
         }
         .uptime-label {
-            @include text-caption;
-            margin-top: 2px;
+            font-size: 0.8rem;
+            color: $on_surface_variant;
+            margin-top: 4px;
         }
     }
+
     .powermenu-btn {
         @include icon-button;
+        font-size: 1.4rem;
+        padding: 12px;
         background: rgba($error, 0.1);
         color: $error;
-        font-size: 1.4rem;
+        border-radius: 16px;
+        border: 1px solid rgba($error, 0.2);
         &:hover {
             background: $error;
             color: $on_error;
+            transform: scale(1.05);
         }
     }
 }
 
-.charts-row {
+.controls-grid {
     display: flex;
-    gap: $spacing-sm;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-.chart-container {
+.control-row {
     @include card;
-    flex: 1;
-    text-align: center;
-    .label-title {
-        @include text-caption;
-        text-transform: uppercase;
-    }
-    .chart-value {
-        @include text-title;
-        font-size: 1.4rem;
-        font-weight: 700;
+    padding: 16px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-left: 4px solid $primary;
+
+    .control-icon {
+        font-size: 1.5rem;
         color: $primary;
+        min-width: 32px;
+        text-align: center;
+    }
+
+    .control-slider {
+        @include scale-track;
+        flex: 1;
+        height: 8px;
+    }
+
+    .control-value {
+        font-size: 0.85rem;
+        color: $on_surface_variant;
+        min-width: 45px;
+        text-align: right;
+    }
+
+    .control-toggle {
+        @include icon-button;
+        font-size: 1.1rem;
+        padding: 8px;
+        border-radius: 12px;
+        &.active {
+            background: rgba($primary, 0.2);
+            color: $primary;
+        }
     }
 }
 
 .network-box {
-    @include glass-subtle;
-    border-radius: $radius-lg;
-    padding: $spacing-md;
-    .network-speed { @include text-body; }
-}
-
-.volume-control-center {
-    @include glass-subtle;
-    border-radius: $radius-lg;
-    padding: $spacing-md;
+    @include card;
+    padding: 14px 16px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
-    .volume-icon {
-        font-size: 1.2rem;
-        color: $primary;
+    justify-content: space-between;
+    border-left: 4px solid $tertiary;
+
+    .network-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        .network-icon {
+            font-size: 1.3rem;
+            color: $tertiary;
+        }
+        .network-speed {
+            font-size: 0.9rem;
+            color: $on_surface;
+        }
     }
-    .volume-scale {
-        @include scale-track;
-        flex: 1;
+    .network-status {
+        font-size: 0.75rem;
+        color: $on_surface_variant;
     }
-    .volume-mute { @include icon-button; }
 }

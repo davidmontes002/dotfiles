@@ -1,0 +1,19 @@
+/*
+ * AGS Colors
+ * Generated with Matugen
+ */
+<* for name, value in colors *>
+$<*name*>': {{value.default.hex}};
+<* endfor *>
+
+// Additional aliases for AGS compatibility
+$surfaceDim: $surface-container;
+$surfaceContainerHigh: $surface-container-high;
+$surfaceContainerHighest: $surface-container-highest;
+$onSurfaceVariant: $on-surface;
+$onSurfaceDim: $on-surface;
+$onPrimary: $on-primary-container;
+$onSecondary: $on-secondary-container;
+$onTertiary: $on-tertiary-container;
+$onError: $on-error-container;
+$onSurface: $on-surface;

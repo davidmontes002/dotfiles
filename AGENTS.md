@@ -1,52 +1,91 @@
 # AGENTS.md
 
-This is a **dotfiles** repository for an Arch Linux + Hyprland Rice with dynamic theming.
+Dotfiles Arch Linux + Hyprland con theming dinámico vía Matugen.
 
-## Key Commands
+## Comandos Esenciales
 
 ```bash
-# Change wallpaper and regenerate all theme colors (primary command)
-~/dotfiles/scripts/cambiar_fondo.sh ~/dotfiles/fondos/<image.jpg>
+# Cambiar wallpaper y regenerar paleta completa
+~/dotfiles/scripts/cambiar_fondo.sh ~/dotfiles/fondos/<imagen.jpg>
 
-# Manual color regeneration (if waybar loses colors)
-matugen image ~/dotfiles/fondos/<image.jpg> -m dark --prefer saturation -c ~/dotfiles/matugen/.config/matugen/config.toml
+# Selector visual de wallpapers
+~/dotfiles/scripts/menu_fondos.sh
 
-# Restart EWW daemon
+# Regenerar colores manualmente (si Waybar pierde theming)
+matugen image ~/dotfiles/fondos/<imagen.jpg> -m dark --prefer saturation \
+  -c ~/dotfiles/matugen/.config/matugen/config.toml
+
+# Reiniciar daemon EWW
 ~/.config/eww/scripts/eww/start.sh
 
-# Temperature sensor path (edit waybar config if missing)
-# waybar/.config/waybar/config.jsonc -> "hwmon-path"
+# Bloquear pantalla
+hyprlock
 ```
 
-## Repo Structure
+## Flujo de Colores Dinámicos
 
-| Directory | Purpose |
-| :--- | :--- |
-| `hypr/` | Hyprland + Hyprlock config |
+```
+Wallpaper → matugen → ~/.cache/colors/
+                        ├── waybar.css    → @import en waybar/style.css
+                        ├── rofi.rasi     → @import en rofi/config.rasi
+                        ├── kitty.conf    → include en kitty.conf
+                        └── colors-hyprland.conf → source en hyprland.conf
+```
+
+## Autostart (hyprland.conf)
+
+Ejecutados automáticamente al iniciar Hyprland:
+- `waybar`
+- `awww-daemon`
+- `~/dotfiles/scripts/bateria.sh &` (monitoreo batería)
+- `~/.config/eww/scripts/daemon_notify/notifications.py &` (daemon D-Bus)
+- `eww daemon --force-wayland` + ventanas EWW
+
+## Keybindings Principales
+
+| Atajo | Acción |
+|-------|--------|
+| `SUPER + Q` | Terminal (Kitty) |
+| `SUPER + R` | Lanzador (Rofi) |
+| `SUPER + A` | Control Center (EWW) |
+| `SUPER + X` | Powermenu (EWW) |
+| `SUPER + L` | Bloquear pantalla |
+| `SUPER + SHIFT + TAB` | Selector wallpapers |
+| `SUPER + C` | Cerrar ventana |
+| `SUPER + V` | Toggle flotante |
+| `Print` | Captura → portapapeles |
+| `SUPER + SHIFT + S` | Captura área → portapapeles |
+
+## Estructura del Repositorio
+
+| Carpeta | Contenido |
+|---------|-----------|
+| `hypr/` | hyprland.conf + hyprlock.conf |
 | `kitty/` | Terminal config |
-| `waybar/` | Status bar config |
-| `eww/` | Widgets (control center, notifications, powermenu) |
-| `matugen/` | Dynamic color engine + templates |
-| `rofi/` | App launcher |
-| `zsh/` | Shell config |
-| `scripts/` | Wallpaper change, battery monitoring scripts |
+| `waybar/` | Barra superior |
+| `rofi/` | Lanzador de apps |
+| `eww/` | Widgets (backup) - Yuck + SCSS |
+| `ags/` | Widgets (nuevo) - JavaScript/QML |
+| `matugen/` | Motor de themes + templates |
+| `zsh/` | Shell config + Starship |
+| `gtk/` | Tema Materia-dark |
+| `scripts/` | cambiar_fondo.sh, menu_fondos.sh, bateria.sh |
 | `fondos/` | Wallpapers |
-| `install.sh` | Installation script |
 
-## Installation
+## Notas Importantes
+
+- **Symlinks**: `install.sh` crea enlaces en `~/.config/`. Editar archivos en dotfiles modifica la fuente
+- **hwmon-path**: sensor de temperatura detectado por install.sh, editar en `waybar/.config/waybar/config.jsonc`
+- **Fuentes requeridas**: `ttf-hack-nerd`, `ttf-nerd-fonts-symbols`, `ttf-jetbrains-mono-nerd`
+
+## AGS (Nueva Configuración)
+
+Ver `ags/MIGRATION.md` para detalles de la migración de EWW a AGS.
 
 ```bash
-git clone https://github.com/davidmontes002/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-chmod +x install.sh
-./install.sh
+# Instalar AGS
+yay -S aylurs-gtk-shell
+
+# Activar en hyprland.conf
+exec-once = ags -r
 ```
-
-The installer creates symlinks from `~/.config/` to the dotfiles directories. After install, reboot and run `Hyprland`.
-
-## Notes
-
-- Symlinks are managed by the install script — editing `~/.config/*` modifies the source files in dotfiles
-- Temperature sensor and network interface are auto-detected during install
-- Matugen extracts colors from wallpaper at runtime for Hyprland, Kitty, Rofi, Waybar, and EWW
-- Font requirement: `ttf-hack-nerd` and `ttf-nerd-fonts-symbols`
