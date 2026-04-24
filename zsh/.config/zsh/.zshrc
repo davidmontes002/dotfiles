@@ -24,4 +24,4 @@ fastfetch
 eval "$(starship init zsh)"
 
 # opencode
-export PATH=/home/cimi/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
