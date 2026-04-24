@@ -4,7 +4,7 @@
 
 Este repositorio contiene la configuración automatizada de mi entorno de desarrollo basado en **Arch Linux** y **Hyprland**.
 
-El núcleo de este sistema es el *Dynamic Ricing*: toda la interfaz (terminal, bordes de ventanas, menús, barra de estado y notificaciones) extrae su paleta de colores automáticamente del fondo de pantalla actual en tiempo real gracias a `Pywal`.
+El núcleo de este sistema es el *Dynamic Ricing*: toda la interfaz extrae su paleta de colores automáticamente del fondo de pantalla actual en tiempo real gracias a **Matugen**.
 
 ---
 
@@ -15,17 +15,17 @@ El núcleo de este sistema es el *Dynamic Ricing*: toda la interfaz (terminal, b
 | Gestor de Ventanas | [Hyprland](https://hyprland.org/) (Wayland) |
 | Terminal | Kitty (con ZSH y Starship) |
 | Lanzador de Apps | Rofi (CSS/RASI personalizado) |
-| Barra de Estado | Waybar (vertical, lado izquierdo) |
-| Motor de Temas Dinámicos | Pywal + awww |
+| Barra de Estado | Waybar (horizontal, parte superior) |
+| Motor de Temas Dinámicos | Matugen |
 | Gestor de Archivos | Thunar (tema Materia-Dark) |
-| Notificaciones | SwayNC |
-| Menú de Energía | Wlogout |
+| Widgets y Control Center | EWW |
+| Notificaciones | EWW + Daemon Python |
+| Menú de Energía | EWW Powermenu |
+| Pantalla de Bloqueo | Hyprlock |
 
 ---
 
 ## ⚙️ Instalación Automatizada
-
-Diseñé un script que descarga dependencias, compila paquetes del AUR y crea todos los enlaces simbólicos (`symlinks`) necesarios para tener el entorno listo en minutos.
 
 ### Paso 1 — Requisitos Previos
 
@@ -40,8 +40,6 @@ cd ~ && rm -rf /tmp/yay
 
 ### Paso 2 — Clonar e instalar
 
-Clona el repositorio **directamente en tu directorio home** y ejecuta el instalador:
-
 ```bash
 git clone https://github.com/davidmontes002/dotfiles.git ~/dotfiles
 cd ~/dotfiles
@@ -51,33 +49,27 @@ chmod +x install.sh
 
 ### Paso 3 — Post-Instalación ⚠️
 
-El script cambiará tu shell por defecto a `zsh` y configurará el entorno Wayland. Para que todo surta efecto:
-
 1. Reinicia tu computadora: `reboot`
-2. Inicia sesión en la consola (TTY) con tu usuario y contraseña
+2. Inicia sesión en la consola (TTY)
 3. Escribe `Hyprland` y presiona Enter
 
 ---
 
-## 🔧 Ajustes Manuales Tras la Instalación
-
-Estos dos ajustes son necesarios porque dependen del hardware específico de tu equipo o de tu nombre de usuario. El script no puede hacerlos automáticamente.
+## 🔧 Ajuste Manual Tras la Instalación
 
 ### Sensor de temperatura en Waybar
 
-El path del sensor está configurado para un hardware específico. Encuéntra el tuyo y actualiza `waybar/.config/waybar/config.jsonc`:
+El instalador detecta el sensor automáticamente, pero si la temperatura no aparece encuéntralo manualmente:
 
 ```bash
-# Listar todos los sensores de temperatura disponibles en tu equipo
 find /sys/class/hwmon/ -name "temp*_input"
 ```
 
-Luego edita la línea correspondiente en la config:
+Edita la línea correspondiente en `waybar/.config/waybar/config.jsonc`:
 
 ```jsonc
 "temperature": {
-    "hwmon-path": "/sys/class/hwmon/hwmonX/temp1_input", // <- reemplaza X
-    ...
+    "hwmon-path": "/sys/class/hwmon/hwmonX/temp1_input"
 }
 ```
 
@@ -86,19 +78,30 @@ Luego edita la línea correspondiente en la config:
 ## 🐛 Solución de Problemas
 
 **Waybar no muestra colores al arrancar**
-Pywal necesita haber generado la paleta al menos una vez. Fórzalo manualmente apuntando a cualquier imagen de `~/dotfiles/fondos/`:
+Regenera los colores manualmente:
 ```bash
-wal -i ~/dotfiles/fondos/nombre_de_imagen.jpg
+matugen image ~/dotfiles/fondos/tu_imagen.jpg -m dark --prefer saturation -c ~/dotfiles/matugen/.config/matugen/config.toml
 ```
 
-**No aparece el ícono de Arch en Waybar**
-Requiere una Nerd Font con el glifo ` `. El paquete `ttf-hack-nerd` incluido en la instalación debería ser suficiente. Si no aparece, instala adicionalmente:
+**EWW no arranca**
+Reinicia el daemon manualmente:
 ```bash
-yay -S ttf-nerd-fonts-symbols-mono
+~/.config/eww/scripts/eww/start.sh
+```
+
+**No aparecen íconos en Waybar**
+Verifica que tienes las fuentes instaladas:
+```bash
+fc-list | grep -i "hack nerd\|symbols nerd"
+```
+
+Si no aparecen:
+```bash
+yay -S ttf-hack-nerd ttf-nerd-fonts-symbols --noconfirm
+fc-cache -fv
 ```
 
 **`chsh` falla al cambiar la shell**
-Ejecuta el cambio manualmente una vez que ZSH esté instalado:
 ```bash
 chsh -s $(which zsh)
 ```
@@ -118,7 +121,9 @@ chsh -s $(which zsh)
 | `SUPER + E` | Abrir Gestor de Archivos (Thunar) |
 | `SUPER + R` | Abrir Menú de Aplicaciones (Rofi) |
 | `SUPER + V` | Alternar modo ventana flotante |
-| `SUPER + X` | Menú de Energía / Apagado (Wlogout) |
+| `SUPER + A` | Abrir/Cerrar Control Center (EWW) |
+| `SUPER + X` | Abrir/Cerrar Menú de Energía (EWW) |
+| `SUPER + L` | Bloquear pantalla (Hyprlock) |
 | `SUPER + SHIFT + TAB` | Selector visual de Fondos de Pantalla |
 
 ### Capturas de Pantalla
@@ -142,39 +147,31 @@ chsh -s $(which zsh)
 
 ## 📁 Estructura del Repositorio
 
-```
 dotfiles/
 ├── fondos/              # Wallpapers (.jpg / .png)
+├── eww/                 # Widgets EWW (control center, notificaciones, powermenu)
 ├── gtk/                 # Tema GTK para Thunar (Materia-Dark)
-├── hypr/                # Configuración de Hyprland
-├── kitty/               # Configuración de la terminal
+├── hypr/                # Configuración de Hyprland + Hyprlock
+├── kitty/               #<LeftMouse> Configuración de la terminal
+├── matugen/             # Motor de temas dinámicos + plantillas
 ├── rofi/                # Lanzador de aplicaciones
 ├── scripts/
 │   ├── bateria.sh       # Monitor de batería con notificaciones
 │   ├── cambiar_fondo.sh # Cambia fondo y regenera toda la paleta
 │   └── menu_fondos.sh   # Selector visual de fondos con Rofi
-├── swaync/              # Centro de notificaciones
-├── wal/                 # Plantillas de Pywal para cada app
-├── waybar/              # Barra de estado lateral
-├── wlogout/             # Menú de apagado/reinicio
+├── waybar/              # Barra de estado superior
 ├── zsh/                 # Configuración de ZSH + Starship
 └── install.sh           # Instalador automatizado
-```
+
 
 ---
 
 ## 🎨 Cambiar el Fondo en Tiempo Real
 
-Para cambiar el fondo y regenerar toda la paleta de colores al instante, usa el selector visual:
-
-```
-SUPER + SHIFT + TAB
-```
-
-O directamente desde la terminal:
+O desde la terminal:
 
 ```bash
 ~/dotfiles/scripts/cambiar_fondo.sh ~/dotfiles/fondos/tu_imagen.jpg
 ```
 
-Esto actualiza simultáneamente Hyprland, Kitty, Rofi, Waybar y SwayNC con los nuevos colores extraídos de la imagen.
+Esto actualiza simultáneamente Hyprland, Kitty, Rofi, Waybar y EWW con los nuevos colores extraídos de la imagen.

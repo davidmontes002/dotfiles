@@ -25,11 +25,17 @@ hyprctl reload >>$LOG 2>&1
 echo "Actualizando extras..." >>$LOG
 touch "$HOME/.config/kitty/kitty.conf"
 pkill -USR1 kitty >>$LOG 2>&1
-swaync-client -rs >>$LOG 2>&1
+# Reiniciar EWW para aplicar nuevos colores
+pkill -f "eww" >>$LOG 2>&1
+sleep 1
+eww daemon --force-wayland >>$LOG 2>&1
+sleep 1
+eww open notifications_popup >>$LOG 2>&1
+eww open control_center >>$LOG 2>&1
 
 # 5. Guardar referencia del wallpaper para hyprlock
 mkdir -p "$HOME/.cache/hyprlock"
 cp "$IMAGEN" "$HOME/.cache/hyprlock/wallpaper.jpg"
-echo "\$wallpaper = $HOME/.cache/hyprlock/wallpaper.jpg" > "$HOME/.cache/hyprlock/wallpaper.conf"
+echo "\$wallpaper = $HOME/.cache/hyprlock/wallpaper.jpg" >"$HOME/.cache/hyprlock/wallpaper.conf"
 
 echo "=== FIN ===" >>$LOG

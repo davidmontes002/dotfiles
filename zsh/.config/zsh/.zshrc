@@ -22,3 +22,6 @@ fastfetch
 # 4. Prompt moderno (Starship)
 # Esto hará que tu prompt (el ➜ ~) se vea mucho más profesional
 eval "$(starship init zsh)"
+
+# opencode
+export PATH=/home/cimi/.opencode/bin:$PATH

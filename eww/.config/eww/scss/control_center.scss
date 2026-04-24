@@ -1,58 +1,95 @@
 .control-center-box {
     @include window;
-    border-radius: 20px 10px 20px 10px;
-    min-width: 400px;
-    padding: 1.2rem;
+    border-radius: $radius-lg;
+    min-width: 420px;
+    padding: $spacing-xl;
 }
 
 .user-card {
-    background-color: rgba($surface_container, 0.8);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 0.5rem;
-
-    .username {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: $on_surface;
-    }
-
-    .uptime-label {
-        font-size: 0.85rem;
-        color: $on_surface_variant;
-    }
+    @include glass;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
 
     .user-image {
         background-image: url("images/user.png");
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
-        min-height: 48px;
-        min-width: 48px;
-        border-radius: 50%;
+        min-height: 56px;
+        min-width: 56px;
+        border-radius: $radius-full;
+        border: 2px solid $primary;
     }
-
+    .user-details {
+        flex: 1;
+        .username {
+            @include text-title;
+            font-size: 1.3rem;
+        }
+        .uptime-label {
+            @include text-caption;
+            margin-top: 2px;
+        }
+    }
     .powermenu-btn {
-        background-color: $on_background;
+        @include icon-button;
+        background: rgba($error, 0.1);
+        color: $error;
         font-size: 1.4rem;
-        color: $surface;
-        border-radius: 10px;
-        padding: 0 12px;
-        transition: 0.3s;
-
         &:hover {
-            background-color: mix($inverse_primary, $on_background, 70%);
+            background: $error;
+            color: $on_error;
         }
     }
 }
 
-.network-box {
-    background-color: rgba($surface_container, 0.6);
-    border-radius: 10px;
-    padding: 8px 12px;
+.charts-row {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: space-between;
+}
 
-    .network-speed {
-        font-size: 0.9rem;
-        color: $on_surface_variant;
+.chart-container {
+    @include card;
+    flex: 1;
+    text-align: center;
+    .label-title {
+        @include text-caption;
+        text-transform: uppercase;
     }
+    .chart-value {
+        @include text-title;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $primary;
+    }
+}
+
+.network-box {
+    @include glass-subtle;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    .network-speed { @include text-body; }
+}
+
+.volume-control-center {
+    @include glass-subtle;
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    .volume-icon {
+        font-size: 1.2rem;
+        color: $primary;
+    }
+    .volume-scale {
+        @include scale-track;
+        flex: 1;
+    }
+    .volume-mute { @include icon-button; }
 }

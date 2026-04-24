@@ -1,70 +1,63 @@
 .notifications-center {
-    background-color: rgba($surface_container, 0.6);
-    border-radius: 12px;
-    padding: 10px;
+    @include glass;
+    border-radius: 16px;
+    padding: 12px;
     margin: 4px 0;
     min-height: 150px;
     max-height: 250px;
 }
 
 .notifications-header {
-    font-size: 1rem;
-    font-weight: bold;
-    color: $on_surface;
+    @include text-title;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
 .notifications-clear {
-    background-color: $inverse_primary;
-    color: $inverse_on_surface;
-    font-size: 1rem;
-    padding: 4px 10px;
-    border-radius: 8px;
-    transition: 0.3s;
-
-    &:hover {
-        background-color: mix($primary, $on_surface, 70%);
-    }
+    @include button-primary;
+    font-size: 0.9rem;
+    padding: 4px 12px;
+    border-radius: 16px;
+    &:hover { background-color: mix($primary, $on_surface, 70%); }
 }
 
 .notification-box {
-    background-color: $primary_container;
-    color: $on_primary_container;
-    border-radius: 10px;
-    margin-top: 6px;
+    @include card;
+    border-radius: 16px;
+    margin-top: 8px;
+    border-left: 3px solid $primary;
 }
 
-.notification-info {
-    margin: 8px;
-}
+.notification-info { margin: 8px; }
 
 .notification-app {
-    font-size: 0.8rem;
-    color: $on_surface_variant;
+    @include text-caption;
+    text-transform: uppercase;
 }
 
 .notification-summary {
     font-weight: bold;
     font-size: 0.95rem;
+    color: $on_surface;
 }
 
 .notification-body {
-    color: $on_surface_variant;
+    @include text-body;
     font-size: 0.85rem;
 }
 
 .notification-close {
-    color: $on_primary_container;
+    @include icon-button;
     font-size: 1rem;
-    border-radius: 8px;
-    padding: 2px 6px;
-    transition: 0.3s;
-
     &:hover {
-        background-color: mix($background, $on_background, 70%);
+        background: rgba($error, 0.15);
+        color: $error;
     }
 }
 
 .notifications-scroll {
     min-height: 80px;
-    margin-top: 6px;
+    margin-top: 8px;
+    @include scrollbar;
 }

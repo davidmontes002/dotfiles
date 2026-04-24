@@ -1,17 +1,20 @@
 #!/bin/bash
 
 echo "======================================================="
-echo "   INICIANDO INSTALACIÓN DEL ENTORNO DE DESARROLLO  "
+echo "   INICIANDO INSTALACIÓN DEL ENTORNO DE DESARROLLO   "
 echo "======================================================="
 
-# 1. Lista de paquetes completa (Básicos + Fuentes + Audio + Wayland + Extras)
+# 1. Lista de paquetes completa
 PAQUETES=(
   # --- NÚCLEO Y VISUALES ---
-  "hyprland" "kitty" "rofi-wayland" "waybar" "python-pywal" "awww"
-  "swaync" "libnotify" "wlogout" "thunar" "materia-gtk-theme" "papirus-icon-theme"
+  "hyprland" "hyprlock" "kitty" "rofi-wayland" "waybar" "matugen" "awww"
+  "libnotify" "thunar" "materia-gtk-theme" "papirus-icon-theme"
+
+  # --- EWW Y DEPENDENCIAS ---
+  "eww" "python-dbus" "python-gobject" "python-pillow" "jq" "zenity"
 
   # --- FUENTES E ICONOS ---
-  "ttf-hack-nerd" "ttf-jetbrains-mono-nerd" "ttf-font-awesome"
+  "ttf-hack-nerd" "ttf-jetbrains-mono-nerd" "ttf-nerd-fonts-symbols"
 
   # --- AUDIO (PipeWire) Y MULTIMEDIA ---
   "pipewire" "pipewire-pulse" "wireplumber" "pavucontrol" "playerctl"
@@ -20,28 +23,29 @@ PAQUETES=(
   "xdg-desktop-portal-hyprland" "xdg-desktop-portal-gtk" "polkit-kde-agent"
   "qt5-wayland" "qt6-wayland"
 
-  # --- HERRAMIENTAS DEL SISTEMA Y APPLETS ---
+  # --- HERRAMIENTAS DEL SISTEMA ---
   "grim" "slurp" "wl-clipboard" "brightnessctl" "psmisc"
   "zsh" "blueman" "network-manager-applet"
 
   # --- EXTRAS PARA THUNAR ---
   "gvfs" "tumbler"
 
-  # --- PAQUETES DE PERSONALIZACIÓN DE INICIO  ---
-  "fastfetch" # Muestra info del sistema con el logo de la distro
-  "starship"  # Un prompt de shell moderno y muy rápido
+  # --- SHELL Y PROMPT ---
+  "fastfetch"
+  "starship"
 )
 
-echo "1/5 Instalando todos los paquetes y dependencias..."
-# yay instalará tanto de repositorios oficiales como del AUR automáticamente
+echo "1/6 Instalando todos los paquetes y dependencias..."
 yay -S --needed --noconfirm "${PAQUETES[@]}"
 
-echo "2/5 Preparando la estructura de directorios..."
+echo "2/6 Preparando la estructura de directorios..."
 mkdir -p ~/.config
-mkdir -p ~/.cache/wal
+mkdir -p ~/.cache/colors
+mkdir -p ~/.cache/hyprlock
+mkdir -p ~/.cache/notify_img_data
 
-echo "3/5 Creando los puentes (Enlaces Simbólicos) desde tu Git..."
-APPS=("hypr" "kitty" "rofi" "waybar" "wal" "wlogout" "swaync" "zsh")
+echo "3/6 Creando los enlaces simbólicos..."
+APPS=("hypr" "kitty" "rofi" "waybar" "matugen" "zsh")
 
 for app in "${APPS[@]}"; do
   if [ -d "$HOME/dotfiles/$app/.config/$app" ]; then
@@ -51,38 +55,76 @@ for app in "${APPS[@]}"; do
   fi
 done
 
-# Reglas GTK para Thunar
+# GTK para Thunar
 if [ -d "$HOME/dotfiles/gtk/.config/gtk-3.0" ]; then
-  echo " -> Enlazando reglas GTK (Materia-Dark)..."
+  echo " -> Enlazando GTK (Materia-Dark)..."
   rm -rf "$HOME/.config/gtk-3.0"
   ln -s "$HOME/dotfiles/gtk/.config/gtk-3.0" "$HOME/.config/gtk-3.0"
 fi
-# Enlace simbólico para la configuración raíz de ZSH
+
+# ZSH
 if [ -f "$HOME/dotfiles/zsh/.config/zsh/.zshrc" ]; then
-  echo " -> Enlazando .zshrc al home..."
+  echo " -> Enlazando .zshrc..."
   rm -f "$HOME/.zshrc"
   ln -s "$HOME/dotfiles/zsh/.config/zsh/.zshrc" "$HOME/.zshrc"
 fi
 
-echo "4/5 Dando permisos y configurando el sistema por defecto..."
-# Permisos a tus scripts
+# EWW — symlink especial
+echo " -> Enlazando eww..."
+rm -rf "$HOME/.config/eww"
+ln -s "$HOME/dotfiles/eww/.config/eww" "$HOME/.config/eww"
+
+# Cava symlink para config generado por Matugen
+mkdir -p "$HOME/.config/cava"
+rm -f "$HOME/.config/cava/config"
+ln -s "$HOME/.cache/colors/cava.ini" "$HOME/.config/cava/config" 2>/dev/null || true
+
+echo "4/6 Dando permisos a los scripts..."
 if [ -d "$HOME/dotfiles/scripts" ]; then
   chmod +x "$HOME/dotfiles/scripts/"*.sh
 fi
+chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/eww/"*.sh
+chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/charts/"*.sh
+chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/power/"*.sh
+chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/notifications/"*.sh
+chmod +x "$HOME/dotfiles/eww/.config/eww/scripts/daemon_notify/notifications.py"
 
-# Cambiar la shell por defecto a ZSH (Kitty la necesita)
-echo " -> Cambiando la shell por defecto a ZSH..."
+echo "5/6 Configurando el sistema..."
+# Shell por defecto a ZSH
+echo " -> Cambiando shell a ZSH..."
 chsh -s $(which zsh)
 
-echo "5/5 Inicializando Pywal para evitar errores en el primer arranque..."
-# Tomamos una de tus imágenes para generar los colores base
-FONDO_INICIAL="$HOME/dotfiles/fondos/black-myth-wukong-3840x2160-18180.jpg"
-if [ -f "$FONDO_INICIAL" ]; then
-  wal -q -i "$FONDO_INICIAL"
+# Detectar sensor de temperatura automáticamente
+echo " -> Detectando sensor de temperatura..."
+SENSOR=$(find /sys/class/hwmon/ -name "temp*_input" 2>/dev/null | head -n 1)
+if [ -n "$SENSOR" ]; then
+  sed -i "s|/sys/class/hwmon/hwmon./temp1_input|$SENSOR|g" \
+    "$HOME/dotfiles/waybar/.config/waybar/config.jsonc"
+  echo " -> Sensor configurado: $SENSOR"
+fi
+
+# Detectar interfaz de red
+echo " -> Detectando interfaz de red..."
+INTERFACE=$(ip route | grep default | awk '{print $5}' | head -n1)
+if [ -n "$INTERFACE" ]; then
+  sed -i "s|INTERFACE=\"wlan0\"|INTERFACE=\"$INTERFACE\"|g" \
+    "$HOME/dotfiles/eww/.config/eww/scripts/eww/network.sh"
+  echo " -> Interfaz configurada: $INTERFACE"
+fi
+
+echo "6/6 Inicializando Matugen para el primer arranque..."
+FONDO_INICIAL=$(find "$HOME/dotfiles/fondos" -type f \( -iname "*.jpg" -o -iname "*.png" \) | head -n 1)
+if [ -n "$FONDO_INICIAL" ]; then
+  matugen image "$FONDO_INICIAL" -m dark --prefer saturation \
+    -c "$HOME/dotfiles/matugen/.config/matugen/config.toml"
+  # Referencia inicial para hyprlock
+  cp "$FONDO_INICIAL" "$HOME/.cache/hyprlock/wallpaper.jpg"
+  echo "\$wallpaper = $HOME/.cache/hyprlock/wallpaper.jpg" > \
+    "$HOME/.cache/hyprlock/wallpaper.conf"
+  echo " -> Colores generados desde: $(basename $FONDO_INICIAL)"
 fi
 
 echo "======================================================="
-echo "INSTALACIÓN COMPLETADA CON ÉXITO!"
-echo "Tus iconos, audio y entorno Wayland están listos."
-echo "Solo necesitas reiniciar tu sesión o escribir 'Hyprland'."
+echo " INSTALACIÓN COMPLETADA"
+echo " Reinicia y escribe 'Hyprland' para entrar al entorno."
 echo "======================================================="

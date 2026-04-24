@@ -1,46 +1,30 @@
 .powermenu-box {
-    background-color: rgba($surface_dim, 0.95);
-    border-radius: 20px;
-    padding: 2rem;
-    spacing: 1rem;
-}
-
-.powermenu-user {
-    font-size: 1.3rem;
-    color: $on_surface;
-    margin-bottom: 1.5rem;
-    font-weight: bold;
+    @include window;
+    border-radius: 16px;
+    padding: 24px;
 }
 
 .powermenu-buttons {
-    margin-top: 0.5rem;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
 }
 
 .powermenu-entry {
-    margin: 0 0.5rem;
-}
-
-.powermenu-button {
-    padding: 1.2rem 2rem;
-    border-radius: 10rem;
-    background-color: $surface_container;
-    color: $on_surface;
-    transition: 0.3s;
-    font-size: 1rem;
-
-    &:hover {
-        background-color: $primary;
-        color: $on_primary;
+    text-align: center;
+    .powermenu-button {
+        background-color: rgba($surface_container, 0.65);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.3s;
+        &:hover {
+            background: $primary;
+            color: $on_primary;
+        }
     }
-}
-
-.powermenu-icon {
-    font-size: 2.5rem;
-}
-
-.powermenu-text {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: $on_surface_variant;
-    font-weight: bold;
+    .powermenu-text {
+        font-size: 0.75rem;
+        color: $on_surface_variant;
+        margin-top: 4px;
+    }
 }

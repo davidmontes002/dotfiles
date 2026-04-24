@@ -1,7 +1,116 @@
+// Base mixins and variables
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 24px;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+$radius-full: 9999px;
+
+$transition-fast: 150ms ease;
+$transition-normal: 300ms ease;
+
 @mixin window {
-    background-color: rgba($surface_dim, 0.92);
-    border-radius: 1rem;
-    padding: 1rem;
+    background-color: rgba($surface_dim, 0.85);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
     color: $on_surface;
-    margin: 0.4rem;
+    margin: $spacing-sm;
+    border: 1px solid rgba($outline, 0.1);
+}
+
+@mixin glass {
+    background-color: rgba($surface_container, 0.75);
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    border: 1px solid rgba($outline, 0.1);
+}
+
+@mixin glass-subtle {
+    background-color: rgba($surface_container, 0.6);
+    border-radius: $radius-md;
+}
+
+@mixin card {
+    background-color: rgba($surface_container, 0.65);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    border: 1px solid rgba($outline, 0.08);
+    transition: all $transition-normal;
+    &:hover {
+        background-color: rgba($surface_container, 0.75);
+        border-color: rgba($primary, 0.2);
+    }
+}
+
+@mixin button-primary {
+    background-color: $primary;
+    color: $on_primary;
+    border-radius: $radius-md;
+    padding: $spacing-sm $spacing-md;
+    transition: all $transition-normal;
+    border: none;
+    cursor: pointer;
+    &:hover { background-color: mix($primary, $on_primary, 85%); }
+}
+
+@mixin icon-button {
+    background: transparent;
+    color: $on_surface_variant;
+    border-radius: $radius-full;
+    padding: $spacing-sm;
+    transition: all $transition-normal;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    &:hover {
+        background-color: rgba($primary, 0.12);
+        color: $primary;
+    }
+}
+
+@mixin scale-track {
+    -webkit-appearance: none;
+    height: 6px;
+    background: rgba($surface_container_high, 0.5);
+    border-radius: $radius-full;
+    outline: none;
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        background: $primary;
+        border-radius: $radius-full;
+        cursor: pointer;
+    }
+}
+
+@mixin text-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $on_surface;
+}
+
+@mixin text-body {
+    font-size: 0.9rem;
+    color: $on_surface_variant;
+}
+
+@mixin text-caption {
+    font-size: 0.75rem;
+    color: $on_surface_variant;
+}
+
+@mixin scrollbar {
+    &::-webkit-scrollbar { width: 5px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+        background: rgba($outline, 0.25);
+        border-radius: $radius-full;
+        &:hover { background: rgba($outline, 0.4); }
+    }
 }
