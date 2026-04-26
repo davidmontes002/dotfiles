@@ -1,0 +1,44 @@
+/* Keybinds Viewer - native 2 columns */
+
+@import "~/.config/rofi/config.rasi"
+
+window {
+  width:  1200px;
+  height: 860px;
+}
+
+mainbox {
+  padding: 16px;
+  spacing: 10px;
+  children: [ "inputbar", "listview" ];
+}
+
+inputbar {
+  margin: 0 0 4px 0;
+  border-radius: 8px;
+}
+
+entry {
+  placeholder: "buscar atajo...";
+}
+
+listview {
+  columns:      2;
+  lines:        26;
+  fixed-height: true;
+  spacing:      2px;
+  scrollbar:    false;
+}
+
+element {
+  padding:      3px 14px;
+  border-radius: 4px;
+}
+
+element-icon {
+  size: 0;
+}
+
+element-text {
+  font: "JetBrainsMono Nerd Font 10.5";
+}

@@ -1,0 +1,30 @@
+###########################
+### HYPRLAND MAIN CONFIG ###
+###########################
+
+# 1. Monitores (Configurados vía monitors.conf)
+source = ~/.config/hypr/monitors.conf
+
+# 2. Variables de Entorno
+source = ~/.config/hypr/modules/env.conf
+
+# 3. Autostart (Servicios y Apps activas al inicio)
+source = ~/.config/hypr/modules/autostart.conf
+
+# 4. Plugins (Carga y Configuración)
+source = ~/.config/hypr/modules/plugins.conf
+
+# 5. Look and Feel (Colores, Animaciones, Sombras)
+source = ~/.config/hypr/modules/appearance.conf
+
+# 6. Entrada y Ajustes Varios
+source = ~/.config/hypr/modules/input.conf
+
+# 7. Atajos de Teclado (Keybindings)
+source = ~/.config/hypr/modules/binds.conf
+
+# 8. Reglas de Ventana
+source = ~/.config/hypr/modules/rules.conf
+
+# 9. TEMA GENERADO (ML4W Switcher) - SE CARGA AL FINAL PARA SOBRESCRIBIR COLORES
+source = ~/.config/hypr/generated-theme.conf

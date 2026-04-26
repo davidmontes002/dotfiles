@@ -1,0 +1,21 @@
+{
+  "name": "YoRHa (NieR:Automata)",
+  "id": "yorha",
+  "default_wallpaper": "wallpapers/african-light.jpg",
+  "gtk_color_scheme": "prefer-dark",
+  "fonts": {
+    "family": "JetBrainsMono Nerd Font Mono",
+    "family_bold": "JetBrainsMono Nerd Font Mono Bold"
+  },
+  "hypr": {
+    "border_size": 2,
+    "gaps_out": 10,
+    "rounding": 12,
+    "blur": {
+      "enabled": true,
+      "size": 4,
+      "passes": 2,
+      "vibrancy": 0.1
+    }
+  }
+}

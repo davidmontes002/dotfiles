@@ -1,0 +1,29 @@
+{
+  "bg": "#282a36",
+  "bg_alt": "#1e1f29",
+  "surface": "#44475a",
+  "surface2": "#6272a4",
+
+  "fg": "#f8f8f2",
+  "fg_dim": "#abb2bf",
+
+  "accent": "#bd93f9",
+  "accent_alt": "#ff79c6",
+
+  "red": "#ff5555",
+  "orange": "#ffb86c",
+  "yellow": "#f1fa8c",
+  "green": "#50fa7b",
+  "teal": "#8be9fd",
+  "blue": "#6272a4",
+  "sky": "#8be9fd",
+  "mauve": "#bd93f9",
+  "pink": "#ff79c6",
+  "lavender": "#8be9fd",
+
+  "border_active": "#bd93f9",
+  "border_inactive": "#44475a",
+
+  "shadow": "#000000",
+  "overlay": "#6272a4"
+}

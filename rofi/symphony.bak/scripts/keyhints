@@ -1,0 +1,71 @@
+#!/bin/bash
+# keyhints - native 2-column rofi keybindings guide
+
+if pidof rofi >/dev/null; then
+  pkill rofi
+  exit
+fi
+
+sep() { echo "──  $1"; echo ""; }
+bind() { printf "  %-22s  %s\n" "$1" "$2"; }
+
+{
+sep "󰀻  APLICACIONES"
+bind "Super + Enter"        "Terminal"
+bind "Super + E"            "Explorador de archivos"
+bind "Super + A"            "Lanzador (Spotlight)"
+bind "Super + Space"        "Launchpad"
+bind "Super + S"            "Guía de atajos"
+bind "Super + V"            "Historial portapapeles"
+
+sep "  VENTANAS"
+bind "Super + Q"            "Cerrar ventana"
+bind "Alt + F4"             "Cerrar ventana"
+bind "Super + F"            "Pantalla completa"
+bind "Super + Shift+Space"  "Flotar / DesFlotar"
+bind "Super + ← ↑ ↓ →"     "Mover foco"
+bind "Super + H J K L"      "Mover foco (vim)"
+bind "Super + Shift + ↑↓←→" "Mover ventana"
+bind "Super + Ctrl  + ↑↓←→" "Redimensionar"
+
+sep "  MINIMIZAR"
+bind "Super + M"            "Minimizar ventana activa"
+bind "Super + N"            "Restaurar última ventana"
+bind "Super + Ctrl + M"     "Minimizar todas"
+bind "Super + Ctrl + N"     "Restaurar todas"
+
+echo ""
+echo ""
+echo ""
+sep "  WORKSPACES"
+bind "Super + 1 … 9 / 0"   "Ir al workspace"
+bind "Super + Shift + 1…9"  "Mover ventana al workspace"
+bind "Super + Scroll ↑↓"    "Navegar workspaces"
+bind "Super + Tab"          "Vista Exposé"
+bind "Alt + Tab"            "Cambiar ventana activa"
+
+sep "  TEMAS Y FONDOS"
+bind "Super + F1"           "Selector de tema"
+bind "Super + W"            "Selector de wallpaper"
+
+sep "  CAPTURAS"
+bind "Print"                "Área → portapapeles"
+bind "Shift + Print"        "Pantalla completa → archivo"
+bind "Ctrl  + Print"        "Pantalla completa → portapapeles"
+
+sep "  MEDIOS"
+bind "XF86AudioRaiseVolume" "Subir volumen"
+bind "XF86AudioLowerVolume" "Bajar volumen"
+bind "XF86AudioMute"        "Silenciar"
+bind "XF86AudioPlay"        "Play / Pausa"
+bind "XF86MonBrightness+"   "Brillo +"
+bind "XF86MonBrightness-"   "Brillo -"
+
+sep "  SISTEMA"
+bind "Super + L"            "Bloquear pantalla"
+bind "Super + Delete"       "Bloquear pantalla"
+bind "Super + Shift + E"    "Menú de energía"
+bind "Super + Shift + M"    "Cerrar sesión"
+} | rofi -dmenu -i -p "  buscar atajo" \
+         -no-custom \
+         -config ~/.config/rofi/config-keybinds.rasi

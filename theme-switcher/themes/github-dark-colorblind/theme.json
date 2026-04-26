@@ -1,0 +1,22 @@
+{
+  "name": "GitHub Dark Colorblind",
+  "id": "github-dark-colorblind",
+  "default_wallpaper": "wallpapers/Fantasy-Autumn.png",
+  "fonts": {
+    "family": "JetBrainsMono Nerd Font",
+    "family_bold": "JetBrainsMono Nerd Font Bold"
+  },
+
+  "hypr": {
+    "border_size": 2,
+    "gaps_out": 18,
+    "rounding": 10,
+
+    "blur": {
+      "enabled": true,
+      "size": 4,
+      "passes": 3,
+      "vibrancy": 0.15
+    }
+  }
+}

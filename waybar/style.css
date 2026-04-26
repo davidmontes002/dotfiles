@@ -1,0 +1,230 @@
+/* Catppuccin Mocha palette */
+@define-color base   #0d1117;
+@define-color mantle #010409;
+@define-color crust  #0d1117;
+@define-color surface0 #161b22;
+@define-color surface1 #21262d;
+@define-color overlay0 #30363d;
+@define-color text   #c9d1d9;
+@define-color subtext0 #8b949e;
+@define-color blue   #bc8cff;
+@define-color mauve  #58a6ff;
+@define-color red    #ec8e2c;
+@define-color green  #79c0ff;
+@define-color yellow #e3b341;
+@define-color peach  #fdac54;
+
+* {
+    font-family: "JetBrainsMono Nerd Font Mono", "JetBrains Mono", monospace;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @text;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: rgba(13,17,23,0.95);
+    border-radius: 12px;
+    padding: 2px 8px;
+    border: 1px solid @surface0;
+}
+
+/* Arch icon */
+#custom-arch {
+    color: @blue;
+    font-size: 18px;
+    padding: 0 8px 0 4px;
+}
+
+/* Workspaces */
+#workspaces {
+    margin: 0 4px;
+}
+
+#workspaces button {
+    padding: 4px 14px;
+    color: @text;
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-width: 32px;
+    box-shadow: none;
+}
+
+#workspaces button:hover {
+    background: @surface0;
+    color: @text;
+}
+
+@keyframes ws-active {
+    0%   { background-color: #bc8cff; }
+    50%  { background-color: #58a6ff; }
+    100% { background-color: #bc8cff; }
+}
+
+@keyframes ws-active {
+    0%   { background-color: #bc8cff; }
+    50%  { background-color: #58a6ff; }
+    100% { background-color: #bc8cff; }
+}
+
+#workspaces button.active {
+    background-color: #bc8cff;
+    color: @base;
+    font-weight: bold;
+    animation: ws-active 3s linear infinite;
+}
+
+#workspaces button.urgent {
+    background: @red;
+    color: @base;
+}
+
+/* Window title */
+#window {
+    color: @text;
+    padding: 0 8px;
+    font-style: italic;
+}
+
+/* Weather */
+#custom-weather {
+    color: @text;
+    padding: 0 8px;
+}
+
+/* Clock */
+#clock {
+    color: @blue;
+    font-weight: bold;
+    padding: 0 10px;
+}
+
+/* CPU */
+#cpu {
+    color: @peach;
+    padding: 0 8px;
+}
+
+#cpu.warning { color: @yellow; }
+#cpu.critical { color: @red; }
+
+/* Memory */
+#memory {
+    color: @mauve;
+    padding: 0 8px;
+}
+
+/* Network */
+#network {
+    color: @green;
+    padding: 0 8px;
+}
+
+#network.disconnected {
+    color: @red;
+}
+
+/* Audio */
+#pulseaudio {
+    color: @blue;
+    padding: 0 8px;
+}
+
+#pulseaudio.muted {
+    color: @overlay0;
+}
+
+/* Battery */
+#battery {
+    color: @green;
+    padding: 0 8px;
+}
+
+#battery.warning {
+    color: @yellow;
+}
+
+#battery.critical {
+    color: @red;
+    animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+    to { color: @base; background: @red; }
+}
+
+/* Tray */
+#tray {
+    padding: 0 8px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: @red;
+    border-radius: 6px;
+}
+
+/* Arch icon */
+#custom-arch {
+    color: @blue;
+    font-size: 20px;
+    padding: 0 10px;
+}
+
+/* Tooltip (calendario y otros) */
+tooltip {
+    background: @mantle;
+    border: 1px solid @surface0;
+    border-radius: 14px;
+    padding: 20px 28px;
+    min-width: 520px;
+}
+
+tooltip label {
+    color: @text;
+    font-family: "JetBrains Mono";
+    font-size: 16px;
+}
+
+/* Power button */
+#custom-swaync {
+    padding: 0 15px;
+}
+
+#custom-power {
+    color: @red;
+    padding: 0 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#custom-power:hover {
+    color: @base;
+    background: @red;
+    border-radius: 8px;
+}
+
+/* Updates button */
+#custom-updates {
+    color: @green;
+    padding: 0 8px;
+}
+#custom-updates.pending {
+    color: @yellow;
+}

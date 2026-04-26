@@ -1,0 +1,1017 @@
+#!/usr/bin/env python3
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GdkPixbuf, Gdk, GLib
+import cairo
+import json, subprocess, os, sys, random, math
+
+_K  = 42
+_D  = lambda e: ''.join(chr(c ^ _K) for c in e)
+_APP      = _D([92,89,108,79,94,73,66])                      # vsFetch
+_APP_VER  = _D([92,89,108,79,94,73,66,10,24,4,26,4,24])       # vsFetch 2.0.2
+_VER_LBL  = _D([124,79,88,89,67,69,68,10,24,4,26,4,24])       # Version 2.0.2
+_APP_ABOUT= _D([107,72,69,95,94,10,92,89,108,79,94,73,66])   # About vsFetch
+_APP_PROC = _D([92,89,76,79,94,73,66])                       # vsfetch
+
+_CLI_MINI    = "--mini"    in sys.argv
+_CLI_VERSION = "--version" in sys.argv
+_cfg_idx     = sys.argv.index("--config") if "--config" in sys.argv else -1
+_CLI_CONFIG  = os.path.expanduser(sys.argv[_cfg_idx + 1]) if _cfg_idx != -1 and _cfg_idx + 1 < len(sys.argv) else None
+
+def hex_to_rgb(h):
+    h = h.lstrip('#')
+    return tuple(int(h[i:i+2], 16) / 255 for i in (0, 2, 4))
+
+def _icon_theme():
+    it = Gtk.IconTheme.get_default()
+    it.append_search_path("/usr/share/icons/Papirus")
+    return it
+
+def _distro_icon_name(it, os_id):
+    _map = {"arch": "archlinux", "opensuse-leap": "opensuse", "opensuse-tumbleweed": "opensuse"}
+    name = f"distributor-logo-{_map.get(os_id, os_id)}"
+    return name if it.has_icon(name) else "preferences-system"
+
+def run(cmd):
+    try:
+        return subprocess.check_output(cmd, shell=True, stderr=subprocess.DEVNULL).decode().strip()
+    except:
+        return "N/A"
+
+# ── config ────────────────────────────────────────────────────────────────────
+
+CONFIG_PATH = _CLI_CONFIG or os.path.expanduser("~/.config/vsfetch/config.json")
+
+DEFAULTS = {
+    "palette": {
+        "bg":               "#13131c",
+        "bg_header":        "#181825",
+        "border":           "#313244",
+        "text":             "#cdd6f4",
+        "text_dim":         "#6c7086",
+        "text_mid":         "#a6adc8",
+        "accent":           "#89b4fa",
+        "ok":               "#a6e3a1",
+        "mid":              "#f9e2af",
+        "hi":               "#f38ba8",
+        "btn_github":       "#238636",
+        "btn_github_hover": "#2ea043",
+        "btn_web":          "#1d6fa5",
+        "btn_web_hover":    "#2484c1"
+    },
+    "font": "JetBrainsMono Nerd Font",
+    "font_sizes": {
+        "title": 20,
+        "body":  13,
+        "small": 11
+    },
+    "default_mode": "full",
+    "sections": ["hardware", "desktop", "terminal", "development", "uptime"],
+    "chassis": "",
+    "dev_tools": [
+        { "icon": "󱘗", "name": "Rust",   "cmd": "rustc --version 2>/dev/null | awk '{print $2}'" },
+        { "icon": "󰙱", "name": "Clang",  "cmd": "clang --version 2>/dev/null | grep -oP 'version [0-9.]+' | awk '{print $2}'" },
+        { "icon": "󰎙", "name": "NodeJS", "cmd": "node --version 2>/dev/null" },
+        { "icon": "󰟓", "name": "Go",     "cmd": "go version 2>/dev/null | awk '{print $3}' | tr -d go" },
+        { "icon": "󰪳", "name": ".NET",   "cmd": "dotnet --version 2>/dev/null" },
+        { "icon": "󰨞", "name": "Editor", "cmd": "code --version 2>/dev/null | head -1" },
+        { "icon": "󰊢", "name": "Git",    "cmd": "git --version 2>/dev/null | awk '{print $3}'" }
+    ],
+    "logo": {
+        "size":     56,
+        "override": "",
+        "sidebar_position": "bottom"
+    },
+    "window": {
+        "width":       700,
+        "height_mini": 380,
+        "height_full": 680
+    },
+    "gradient_bar": {
+        "enabled": False,
+        "color_a": "#89b4fa",
+        "color_b": "#f38ba8"
+    },
+    "layout": "top",
+    "bg_image": {
+        "enabled": True,
+        "path":    "",
+        "size":    200,
+        "opacity": 0.15
+    },
+    "animation": {
+        "enabled": False,
+        "type":    "rain",
+        "scope":   "body",
+        "color":   "",
+        "opacity": 0.25,
+        "speed":   1.0,
+        "drops":   80
+    }
+}
+
+def _merge_config(cfg, user):
+    for section in ("palette", "font_sizes", "logo", "window", "gradient_bar", "bg_image", "animation"):
+        if section in user:
+            cfg[section].update(user[section])
+    for key in ("font", "default_mode", "sections", "chassis", "dev_tools", "layout"):
+        if key in user:
+            cfg[key] = user[key]
+
+def load_config():
+    cfg = json.loads(json.dumps(DEFAULTS))   # deep copy
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH) as f:
+                user = json.load(f)
+            _merge_config(cfg, user)
+            if _CLI_CONFIG is None and "extends" in user:
+                ext_path = os.path.expanduser(user["extends"])
+                if os.path.isfile(ext_path):
+                    try:
+                        with open(ext_path) as f2:
+                            _merge_config(cfg, json.load(f2))
+                    except Exception as e:
+                        print(f"vsFetch: could not read extends config ({e})", file=sys.stderr)
+                else:
+                    print(f"vsFetch: extends file not found: {ext_path}", file=sys.stderr)
+        except Exception as e:
+            print(f"vsFetch: could not read config ({e}), using defaults", file=sys.stderr)
+    return cfg
+
+GLib.set_prgname(_APP_PROC)
+
+CFG = load_config()
+P   = CFG["palette"]
+W   = CFG["window"]
+
+# Mode priority: CLI flag > config default_mode > "full"
+if _CLI_MINI:
+    MINI, VERSION = True, False
+elif _CLI_VERSION:
+    MINI, VERSION = False, True
+else:
+    _mode = CFG["default_mode"].lower()
+    MINI    = _mode == "mini"
+    VERSION = _mode == "version"
+
+def build_css():
+    font = CFG["font"]
+    FS   = CFG["font_sizes"]
+    return f"""
+* {{ font-family: "{font}", monospace; }}
+window {{ background-color: {P['bg']}; }}
+.header {{ background-color: {P['bg_header']}; }}
+.distro  {{ color: {P['text']}; font-size: {FS['title']}px; font-weight: bold; }}
+.fetched {{ color: {P['text_dim']}; font-size: {FS['small']}px; }}
+.section {{ color: {P['accent']}; font-size: {FS['small']}px; font-weight: bold; }}
+.icon    {{ color: {P['accent']}; font-size: {FS['body']}px; }}
+.key     {{ color: {P['accent']}; font-size: {FS['body']}px; }}
+.val     {{ color: {P['text']}; font-size: {FS['body']}px; }}
+.pct-ok  {{ color: {P['ok']}; font-size: {FS['body']}px; }}
+.pct-mid {{ color: {P['mid']}; font-size: {FS['body']}px; }}
+.pct-hi  {{ color: {P['hi']}; font-size: {FS['body']}px; }}
+separator {{ background-color: {P['border']}; margin-top: 2px; margin-bottom: 2px; }}
+.ver-box    {{ background-color: {P['bg']}; }}
+.ver-name   {{ color: {P['text']}; font-size: {FS['title']}px; font-weight: bold; }}
+.ver-sub    {{ color: {P['text_dim']}; font-size: {FS['small']}px; }}
+.ver-desc   {{ color: {P['text_mid']}; font-size: 13px; }}
+.ver-author {{ color: {P['accent']}; font-size: 13px; font-weight: bold; }}
+.link-btn         {{ border: none; border-radius: 8px; padding: 8px 18px; font-size: 12px; color: #ffffff; }}
+.link-btn-github  {{ background-color: {P['btn_github']}; }}
+.link-btn-github:hover {{ background-color: {P['btn_github_hover']}; }}
+.link-btn-web     {{ background-color: {P['btn_web']}; }}
+.link-btn-web:hover    {{ background-color: {P['btn_web_hover']}; }}
+""".encode()
+
+CSS = build_css()
+
+def pct_class(pct_str):
+    try:
+        p = int(pct_str.strip('%'))
+        if p < 50: return "pct-ok"
+        if p < 80: return "pct-mid"
+        return "pct-hi"
+    except:
+        return "val"
+
+# ── data collectors ───────────────────────────────────────────────────────────
+
+def sys_info():
+    return [
+        ("󰌽", "Linux",   run("uname -o") + " " + run("uname -m")),
+        ("󰥔", "Fetched", run("date '+%Y-%m-%d %H:%M:%S %Z'")),
+        ("󰀲", "Locale",  os.environ.get("LANG", run("locale | grep LANG= | cut -d= -f2"))),
+    ]
+
+def hardware_info():
+    rows = []
+    _chassis_map = {
+        "1": "Other",      "2": "Unknown",    "3": "Desktop",
+        "4": "Desktop",    "5": "Desktop",    "6": "Tower",
+        "7": "Tower",      "8": "Portable",   "9": "Laptop",
+        "10": "Notebook",  "11": "Handheld",  "13": "All-in-One",
+        "14": "Notebook",  "17": "Server",    "23": "Server",
+        "28": "Blade",     "30": "Tablet",    "31": "Convertible",
+        "32": "Detachable","35": "Mini PC",   "36": "Stick PC",
+    }
+    if CFG["chassis"]:
+        chassis = CFG["chassis"]
+    else:
+        try:
+            with open("/sys/class/dmi/id/chassis_type") as _f:
+                _ct = _f.read().strip()
+            chassis = _chassis_map.get(_ct, f"Unknown ({_ct})")
+        except Exception:
+            chassis = "Unknown"
+    rows.append(("󰍹", "Chassis", chassis))
+
+    ram_total = run("free -h | awk '/^Mem:/{print $2}'")
+    ram_used  = run("free -h | awk '/^Mem:/{print $3}'")
+    ram_pct   = run("free | awk '/^Mem:/{printf \"%d%%\", $3/$2*100}'")
+    rows.append(("󰓅", "RAM", f"{ram_used} / {ram_total}", ram_pct))
+
+    swap = run("free -h | awk '/^Swap:/{print $2}'")
+    if swap in ("0B", "0", ""):
+        rows.append(("󰁡", "SWAP", "Disabled"))
+    else:
+        swap_used = run("free -h | awk '/^Swap:/{print $3}'")
+        rows.append(("󰁡", "SWAP", f"{swap_used} / {swap}"))
+
+    cpu = run("grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2").strip()
+    cores = run("nproc")
+    freq  = run("grep 'cpu MHz' /proc/cpuinfo | awk '{s+=$4;n++} END{printf \"%.2f GHz\", s/n/1000}'")
+    rows.append(("󰍛", "CPU", f"{cpu} ({cores}) @ {freq}"))
+
+    gpu = run("lspci 2>/dev/null | grep -i 'VGA compatible controller' | head -1 | sed 's/.*: //;s/ (rev.*//' | sed 's/Advanced Micro Devices, Inc. \\[AMD.ATI\\] //'") or \
+          run("lspci 2>/dev/null | grep -i '3D controller' | head -1 | sed 's/.*: //;s/ (rev.*//'")
+    rows.append(("󰍹", "GPU", gpu or "N/A"))
+
+    disks = run("df -h --output=source,size,used,pcent,target -x tmpfs -x devtmpfs -x efivarfs | tail -n +2")
+    seen_devs = set()
+    for line in disks.splitlines():
+        p = line.split()
+        if len(p) >= 5 and p[0].startswith('/dev/') and p[0] not in seen_devs:
+            seen_devs.add(p[0])
+            fs = run(f"lsblk -no FSTYPE {p[0]} 2>/dev/null | head -1") or ""
+            rows.append(("󰋊", "Disk", f"{p[2]} / {p[1]}", p[3], f"— {fs}"))
+    return rows
+
+def desktop_info():
+    session = os.environ.get('XDG_SESSION_TYPE', '')
+    de      = os.environ.get('XDG_CURRENT_DESKTOP', '') or os.environ.get('XDG_SESSION_DESKTOP', '') or os.environ.get('DESKTOP_SESSION', '')
+    ver     = run("hyprctl version 2>/dev/null | grep -oP 'v[0-9]+\\.[0-9]+\\.[0-9]+' | head -1")
+    if ver:
+        label = f"Hyprland {ver} ({session.capitalize()})" if session else f"Hyprland {ver}"
+    elif de:
+        label = f"{de} ({session.capitalize()})" if session else de
+    else:
+        label = session.capitalize() or "Unknown"
+
+    # Active monitors — try Hyprland → xrandr → wlr-randr → fallback
+    displays = ""
+    try:
+        raw = subprocess.check_output("hyprctl monitors -j", shell=True, stderr=subprocess.DEVNULL).decode()
+        monitors = json.loads(raw)
+        displays = "  ".join(f"{m['name']}: {m['width']}x{m['height']}@{round(m['refreshRate'])}Hz" for m in monitors)
+    except Exception:
+        pass
+
+    if not displays:
+        xrandr = run("xrandr 2>/dev/null | awk '/connected/ && /[0-9]+x[0-9]+/{match($0,/[0-9]+x[0-9]+/); print $1\": \"substr($0,RSTART,RLENGTH)}'")
+        if xrandr and xrandr != "N/A":
+            displays = "  ".join(xrandr.splitlines())
+
+    if not displays:
+        wlr = run("wlr-randr 2>/dev/null | awk '/^[A-Z]/{name=$1} /current/{print name\": \"$1}'")
+        if wlr and wlr != "N/A":
+            displays = "  ".join(wlr.splitlines())
+
+    if not displays:
+        displays = os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY") or "N/A"
+
+    driver = run("lsmod | awk '/^amdgpu/{print \"amdgpu\"}' | head -1") or \
+             run("lsmod | awk '/^nvidia/{print \"nvidia\"}' | head -1") or "N/A"
+    return [
+        ("󰉼", "Session",  label),
+        ("󰍹", "Display",  displays),
+        ("󰍹", "G-Driver", driver),
+    ]
+
+def terminal_info():
+    # shell
+    _sh = os.environ.get("SHELL", "")
+    shell = run(f"{_sh} --version 2>/dev/null | head -1") if _sh else "N/A"
+    if shell in ("N/A", ""):
+        shell = os.path.basename(_sh) if _sh else "N/A"
+
+    # terminal — try common ones in order
+    term = (run("kitty --version 2>/dev/null | head -1 | awk '{print $1\" \"$2}'")         or
+            run("alacritty --version 2>/dev/null | head -1 | awk '{print $1\" \"$2}'")     or
+            run("wezterm --version 2>/dev/null | head -1")                                  or
+            run("foot --version 2>/dev/null | head -1")                                     or
+            run("xfce4-terminal --version 2>/dev/null | head -1 | awk '{print $1\" \"$2}'") or
+            run("konsole --version 2>/dev/null | head -1")                                  or
+            run("gnome-terminal --version 2>/dev/null | head -1 | awk '{print $1\" \"$NF}'") or
+            run("tilix --version 2>/dev/null | head -1")                                    or
+            os.environ.get("TERM_PROGRAM", "") or os.environ.get("TERM", "N/A"))
+
+    # font — try common terminal configs
+    font = (run("grep -E '^font_family' ~/.config/kitty/kitty.conf 2>/dev/null | awk '{$1=\"\"; print $0}' | xargs")                          or
+            run("grep -E 'family' ~/.config/alacritty/alacritty.toml 2>/dev/null | head -1 | cut -d'\"' -f2")                                 or
+            run("grep -E 'family' ~/.config/alacritty/alacritty.yml 2>/dev/null | head -1 | awk '{print $2}' | tr -d '\"'")                   or
+            run("grep -E 'font' ~/.config/foot/foot.ini 2>/dev/null | head -1 | cut -d= -f2 | awk '{print $1}'")                              or
+            run("grep -rE 'font-family' ~/.config/wezterm/wezterm.lua 2>/dev/null | head -1 | cut -d'\"' -f2"))
+
+    # packages — detect available package managers
+    pkg_parts = []
+    for cmd, label in [
+        ("pacman -Q 2>/dev/null | wc -l",           "pacman"),
+        ("dpkg -l 2>/dev/null | grep -c '^ii'",     "dpkg"),
+        ("rpm -qa 2>/dev/null | wc -l",             "rpm"),
+        ("apk list --installed 2>/dev/null | wc -l","apk"),
+    ]:
+        n = run(cmd)
+        if n and n not in ("N/A", "0", ""):
+            pkg_parts.append(f"{n} ({label})")
+    flat = run("flatpak list 2>/dev/null | wc -l")
+    if flat and flat not in ("N/A", "0", ""):
+        pkg_parts.append(f"{flat} (flatpak)")
+    snap = run("snap list 2>/dev/null | tail -n +2 | wc -l")
+    if snap and snap not in ("N/A", "0", ""):
+        pkg_parts.append(f"{snap} (snap)")
+    packages = ", ".join(pkg_parts) if pkg_parts else "N/A"
+
+    return [
+        ("󰈺", "Shell",     shell),
+        ("󰆍", "Terminal",  term),
+        ("󰛖", "Term Font", font.strip() if font else "N/A"),
+        ("󰏘", "Packages",  packages),
+    ]
+
+def dev_info():
+    results = []
+    for t in CFG["dev_tools"]:
+        v = run(t["cmd"])
+        if v and v not in ("N/A", ""):
+            results.append((t["icon"], t["name"], v))
+    return results
+
+def uptime_info():
+    upt   = run("uptime -p | sed 's/up //'")
+    user    = os.environ.get("USER") or os.environ.get("LOGNAME") or run("whoami 2>/dev/null")
+    tty_raw = run("tty 2>/dev/null")
+    tty     = tty_raw.replace("/dev/", "", 1) if tty_raw and tty_raw not in ("N/A", "") and "not a tty" not in tty_raw else "localhost"
+    login   = f"{user}@{tty}"
+    os_age = "N/A"
+    for log_cmd in [
+        "head -1 /var/log/pacman.log 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+        "head -1 /var/log/dpkg.log 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+        "head -1 /var/log/dnf.rpm.log 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+        "head -1 /var/log/zypp/history 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+        "head -1 /var/log/yum.log 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+    ]:
+        age_dt = run(log_cmd)
+        if age_dt and age_dt != "N/A" and len(age_dt) == 10:
+            days = run(f"echo $(( ( $(date +%s) - $(date -d {age_dt} +%s 2>/dev/null || echo $(date +%s)) ) / 86400 ))")
+            os_age = f"{age_dt} [{days} days]"
+            break
+    return [
+        ("󰔟", "Uptime", upt),
+        ("󰀄", "Login",  login),
+        ("󰃰", "OS Age", os_age),
+    ]
+
+# ── window ────────────────────────────────────────────────────────────────────
+
+class AboutSystem(Gtk.Window):
+    def __init__(self):
+        super().__init__(title="About This System")
+        self.set_resizable(False)
+        self.set_position(Gtk.WindowPosition.CENTER)
+
+        self.set_border_width(0)
+
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CSS)
+        display = Gdk.Display.get_default()
+        screen = display.get_default_screen() if display else Gdk.Screen.get_default()
+        Gtk.StyleContext.add_provider_for_screen(
+            screen, provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        layout = CFG.get("layout", "top")
+        root = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL if layout == "left" else Gtk.Orientation.VERTICAL)
+
+        overlay      = Gtk.Overlay()
+        body_overlay = Gtk.Overlay()
+        overlay.add(root)
+        self.add(overlay)
+
+        # ── collect section data and auto-size window ─────────────
+        _section_map = {
+            "hardware":    ("Hardware",    hardware_info),
+            "desktop":     ("Desktop",     desktop_info),
+            "terminal":    ("Terminal",    terminal_info),
+            "development": ("Development", dev_info),
+            "uptime":      ("Uptime",      uptime_info),
+        }
+
+        if MINI:
+            sections_data = [("Hardware", hardware_info())]
+        else:
+            sections_data = []
+            for key in CFG["sections"]:
+                if key in _section_map:
+                    title, fn = _section_map[key]
+                    sections_data.append((title, fn()))
+
+        total_rows = sum(len(rows) for _, rows in sections_data)
+        num_sections = len(sections_data)
+        header_h = 32 if CFG.get("layout", "top") == "left" else 115
+        row_h = 18
+        section_h = 20
+        padding = 20
+        auto_h = header_h + num_sections * section_h + total_rows * row_h + padding
+        cfg_h = W["height_mini"] if MINI else W["height_full"]
+        display = Gdk.Display.get_default()
+        monitor = display.get_primary_monitor() if display else None
+        if not monitor and display:
+            monitor = display.get_monitor(0)
+        max_h = int(monitor.get_geometry().height * 0.9) if monitor else None
+        final_h = min(max(cfg_h, auto_h), max_h) if max_h else max(cfg_h, auto_h)
+        self.set_default_size(W["width"], final_h)
+        if MINI:
+            W["height_mini"] = final_h
+        else:
+            W["height_full"] = final_h
+
+        # ── animation ─────────────────────────────────────────────
+        AN = CFG["animation"]
+
+        def _add_anim(canvas, draw_fn, tick_fn):
+            canvas.set_halign(Gtk.Align.FILL)
+            canvas.set_valign(Gtk.Align.FILL)
+            canvas.set_opacity(float(AN["opacity"]))
+            canvas.connect("draw", draw_fn)
+            GLib.timeout_add(16, tick_fn)
+            target = overlay if AN.get("scope", "body") == "full" else body_overlay
+            target.add_overlay(canvas)
+            target.set_overlay_pass_through(canvas, True)
+
+        if AN["enabled"] and AN["type"] == "rain":
+            rain_color = hex_to_rgb(AN["color"]) if AN["color"] else hex_to_rgb(P["accent"])
+            speed_mult = float(AN["speed"])
+            win_w      = W["width"]
+            win_h      = W["height_mini"] if MINI else W["height_full"]
+            ANGLE      = math.radians(15)
+            SIN_A      = math.sin(ANGLE)
+            COS_A      = math.cos(ANGLE)
+            TAN_A      = math.tan(ANGLE)
+
+            drops = [
+                {
+                    "x":      random.uniform(0, win_w),
+                    "y":      random.uniform(-150, 0),
+                    "length": random.randint(10, 45),
+                    "speed":  random.uniform(4, 10) * speed_mult,
+                    "alpha":  random.uniform(0.3, 1.0),
+                }
+                for _ in range(int(AN["drops"]))
+            ]
+
+            rain_canvas = Gtk.DrawingArea()
+
+            def draw_rain(widget, cr):
+                cr.set_line_width(1.2)
+                for d in drops:
+                    cr.set_source_rgba(*rain_color, d["alpha"])
+                    cr.move_to(d["x"], d["y"])
+                    cr.line_to(d["x"] - d["length"] * SIN_A, d["y"] - d["length"] * COS_A)
+                    cr.stroke()
+
+            def tick_rain():
+                for d in drops:
+                    d["y"] += d["speed"]
+                    d["x"] += d["speed"] * TAN_A
+                    if d["y"] - d["length"] > win_h or d["x"] > win_w:
+                        d["y"] = random.uniform(-d["length"] * 2, 0)
+                        d["x"] = random.uniform(-50, win_w)
+                        d["alpha"] = random.uniform(0.3, 1.0)
+                        d["speed"] = random.uniform(4, 10) * speed_mult
+                rain_canvas.queue_draw()
+                return True
+
+            _add_anim(rain_canvas, draw_rain, tick_rain)
+
+        elif AN["enabled"] and AN["type"] == "snow":
+            snow_color = hex_to_rgb(AN["color"]) if AN["color"] else (1.0, 1.0, 1.0)
+            speed_mult = float(AN["speed"])
+            win_w      = W["width"]
+            win_h      = W["height_mini"] if MINI else W["height_full"]
+
+            flakes = [
+                {
+                    "x":     random.uniform(0, win_w),
+                    "y":     random.uniform(-win_h, 0),
+                    "r":     random.uniform(1.5, 3.5),
+                    "speed": random.uniform(0.6, 2.0) * speed_mult,
+                    "drift": random.uniform(0.3, 1.2),
+                    "freq":  random.uniform(0.01, 0.03),
+                    "phase": random.uniform(0, 2 * math.pi),
+                    "alpha": random.uniform(0.4, 1.0),
+                    "t":     random.uniform(0, 1000),
+                }
+                for _ in range(int(AN["drops"]))
+            ]
+
+            snow_canvas = Gtk.DrawingArea()
+
+            def draw_snow(widget, cr):
+                for f in flakes:
+                    cr.set_source_rgba(*snow_color, f["alpha"])
+                    cr.arc(f["x"], f["y"], f["r"], 0, 2 * math.pi)
+                    cr.fill()
+
+            def tick_snow():
+                for f in flakes:
+                    f["t"] += 1
+                    f["y"] += f["speed"]
+                    f["x"] += math.sin(f["t"] * f["freq"] + f["phase"]) * f["drift"]
+                    if f["y"] - f["r"] > win_h:
+                        f["y"] = random.uniform(-f["r"] * 2, 0)
+                        f["x"] = random.uniform(0, win_w)
+                        f["alpha"] = random.uniform(0.4, 1.0)
+                        f["speed"] = random.uniform(0.6, 2.0) * speed_mult
+                        f["t"]     = random.uniform(0, 1000)
+                snow_canvas.queue_draw()
+                return True
+
+            _add_anim(snow_canvas, draw_snow, tick_snow)
+
+        elif AN["enabled"] and AN["type"] == "matrix":
+            mat_color  = hex_to_rgb(AN["color"]) if AN["color"] else hex_to_rgb(P["accent"])
+            speed_mult = float(AN["speed"])
+            win_w      = W["width"]
+            win_h      = W["height_mini"] if MINI else W["height_full"]
+            CHAR_SIZE  = 14
+            CHARS      = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789"
+
+            num_cols = win_w // CHAR_SIZE
+            columns  = [
+                {
+                    "x":     i * CHAR_SIZE,
+                    "y":     random.uniform(-win_h, 0),
+                    "speed": random.uniform(2, 7) * speed_mult,
+                    "trail": random.randint(8, 22),
+                    "chars": [random.choice(CHARS) for _ in range(25)],
+                }
+                for i in range(num_cols)
+            ]
+
+            mat_canvas = Gtk.DrawingArea()
+
+            def draw_matrix(widget, cr):
+                cr.select_font_face("monospace", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+                cr.set_font_size(CHAR_SIZE)
+                for col in columns:
+                    for i in range(col["trail"]):
+                        cy = col["y"] - i * CHAR_SIZE
+                        if cy < 0 or cy > win_h:
+                            continue
+                        if i == 0:
+                            cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
+                        else:
+                            alpha = (1.0 - i / col["trail"]) ** 1.5
+                            cr.set_source_rgba(*mat_color, alpha)
+                        cr.move_to(col["x"], cy)
+                        cr.show_text(col["chars"][i % len(col["chars"])])
+
+            def tick_matrix():
+                for col in columns:
+                    col["y"] += col["speed"]
+                    if random.random() < 0.15:
+                        col["chars"][random.randint(0, len(col["chars"]) - 1)] = random.choice(CHARS)
+                    if col["y"] - col["trail"] * CHAR_SIZE > win_h:
+                        col["y"]     = random.uniform(-col["trail"] * CHAR_SIZE, 0)
+                        col["speed"] = random.uniform(2, 7) * speed_mult
+                        col["trail"] = random.randint(8, 22)
+                mat_canvas.queue_draw()
+                return True
+
+            _add_anim(mat_canvas, draw_matrix, tick_matrix)
+
+        elif AN["enabled"] and AN["type"] == "aurora":
+            speed_mult = float(AN["speed"])
+            win_h      = W["height_mini"] if MINI else W["height_full"]
+
+            bands = [
+                {"y_frac": 0.50, "amp": 50, "freq": 0.007, "phase": 0.0, "spd": 0.012 * speed_mult, "color": hex_to_rgb(AN["color"]) if AN["color"] else hex_to_rgb(P["accent"]), "alpha": 0.55},
+                {"y_frac": 0.63, "amp": 60, "freq": 0.005, "phase": 2.1, "spd": 0.009 * speed_mult, "color": hex_to_rgb(P["hi"]),                                                   "alpha": 0.45},
+                {"y_frac": 0.76, "amp": 45, "freq": 0.009, "phase": 4.2, "spd": 0.015 * speed_mult, "color": hex_to_rgb(P["ok"]),                                                   "alpha": 0.40},
+            ]
+
+            aurora_canvas = Gtk.DrawingArea()
+
+            def draw_aurora(widget, cr):
+                w = widget.get_allocated_width()
+                h = widget.get_allocated_height()
+                for band in bands:
+                    y_base    = band["y_frac"] * h
+                    amp       = band["amp"]
+                    r, g, b   = band["color"]
+                    cr.move_to(0, h)
+                    for x in range(0, w + 2, 2):
+                        cr.line_to(x, y_base + amp * math.sin(x * band["freq"] + band["phase"]))
+                    cr.line_to(w, h)
+                    cr.close_path()
+                    grad = cairo.LinearGradient(0, y_base - amp * 2, 0, y_base + amp * 2)
+                    grad.add_color_stop_rgba(0.0, r, g, b, 0.0)
+                    grad.add_color_stop_rgba(0.4, r, g, b, band["alpha"])
+                    grad.add_color_stop_rgba(1.0, r, g, b, 0.0)
+                    cr.set_source(grad)
+                    cr.fill()
+
+            def tick_aurora():
+                for band in bands:
+                    band["phase"] += band["spd"]
+                aurora_canvas.queue_draw()
+                return True
+
+            _add_anim(aurora_canvas, draw_aurora, tick_aurora)
+
+        elif AN["enabled"] and AN["type"] == "warp":
+            warp_color = hex_to_rgb(AN["color"]) if AN["color"] else (1.0, 1.0, 1.0)
+            speed_mult = float(AN["speed"])
+            win_w      = W["width"]
+            win_h      = W["height_mini"] if MINI else W["height_full"]
+            cx         = win_w / 2
+            cy         = win_h / 2
+            max_dist   = math.sqrt(cx**2 + cy**2) * 1.2
+
+            stars = [
+                {
+                    "angle": random.uniform(0, 2 * math.pi),
+                    "dist":  random.uniform(0, max_dist),
+                    "speed": random.uniform(1.0, 3.0) * speed_mult,
+                    "alpha": random.uniform(0.4, 1.0),
+                }
+                for _ in range(int(AN["drops"]))
+            ]
+
+            warp_canvas = Gtk.DrawingArea()
+
+            def draw_warp(widget, cr):
+                r, g, b = warp_color
+                for s in stars:
+                    dist = s["dist"]
+                    if dist < 1:
+                        continue
+                    trail  = max(2, dist * 0.15)
+                    x1     = cx + math.cos(s["angle"]) * dist
+                    y1     = cy + math.sin(s["angle"]) * dist
+                    x0     = cx + math.cos(s["angle"]) * (dist - trail)
+                    y0     = cy + math.sin(s["angle"]) * (dist - trail)
+                    alpha  = s["alpha"] * min(1.0, dist / (max_dist * 0.3))
+                    cr.set_line_width(0.5 + (dist / max_dist) * 1.5)
+                    cr.set_source_rgba(r, g, b, alpha)
+                    cr.move_to(x0, y0)
+                    cr.line_to(x1, y1)
+                    cr.stroke()
+
+            def tick_warp():
+                for s in stars:
+                    s["dist"] += s["speed"] * (1.0 + s["dist"] / (max_dist * 0.4))
+                    if s["dist"] > max_dist:
+                        s["dist"]  = random.uniform(0, 5)
+                        s["angle"] = random.uniform(0, 2 * math.pi)
+                        s["alpha"] = random.uniform(0.4, 1.0)
+                        s["speed"] = random.uniform(1.0, 3.0) * speed_mult
+                warp_canvas.queue_draw()
+                return True
+
+            _add_anim(warp_canvas, draw_warp, tick_warp)
+
+        os_id         = run("grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '\"'").lower()
+        os_name       = run("grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '\"'")
+        _it           = _icon_theme()
+        _date         = run("date '+%Y-%m-%d  %H:%M:%S  %Z'")
+        date_str      = _date + "  ·  " + os.environ.get("LANG", "")
+        date_str_slim = _date
+
+        BI = CFG["bg_image"]
+        bi_path = os.path.expanduser(BI["path"])
+        try:
+            if not BI.get("enabled", False): raise ValueError("bg_image disabled")
+            sz = int(BI["size"])
+            if bi_path and os.path.isfile(bi_path):
+                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(bi_path, sz, sz, True)
+            else:
+                pb = _it.load_icon(_distro_icon_name(_it, os_id), sz, Gtk.IconLookupFlags.FORCE_SIZE)
+            bi_img = Gtk.Image.new_from_pixbuf(pb)
+            bi_img.set_halign(Gtk.Align.END)
+            bi_img.set_valign(Gtk.Align.END)
+            bi_img.set_opacity(float(BI["opacity"]))
+            overlay.add_overlay(bi_img)
+            overlay.set_overlay_pass_through(bi_img, True)
+        except Exception:
+            pass
+
+        # ── logo (shared) ─────────────────────────────────────────
+        logo_size     = CFG["logo"]["size"]
+        logo_override = os.path.expanduser(CFG["logo"]["override"])
+
+        if logo_override and os.path.isfile(logo_override):
+            logo_widget = Gtk.Image.new_from_pixbuf(
+                GdkPixbuf.Pixbuf.new_from_file_at_size(logo_override, logo_size, logo_size)
+            )
+        elif logo_override and _it.has_icon(logo_override):
+            logo_widget = Gtk.Image.new_from_icon_name(logo_override, Gtk.IconSize.INVALID)
+            logo_widget.set_pixel_size(logo_size)
+        else:
+            logo_widget = Gtk.Image.new_from_icon_name(_distro_icon_name(_it, os_id), Gtk.IconSize.INVALID)
+            logo_widget.set_pixel_size(logo_size)
+        GB       = CFG["gradient_bar"]
+
+        def make_grad_bar(vertical=False):
+            offset = [0.0]
+            bar = Gtk.DrawingArea()
+            bar.set_size_request(3 if vertical else -1, -1 if vertical else 3)
+
+            def draw(widget, cr):
+                dim = widget.get_allocated_height() if vertical else widget.get_allocated_width()
+                o   = offset[0] % dim
+                grad = cairo.LinearGradient(0, o - dim, 0, o + dim) if vertical \
+                       else cairo.LinearGradient(o - dim, 0, o + dim, 0)
+                grad.add_color_stop_rgb(0.0, *hex_to_rgb(GB["color_a"]))
+                grad.add_color_stop_rgb(0.5, *hex_to_rgb(GB["color_b"]))
+                grad.add_color_stop_rgb(1.0, *hex_to_rgb(GB["color_a"]))
+                cr.set_source(grad)
+                cr.paint()
+
+            def tick():
+                offset[0] += 2.5
+                bar.queue_draw()
+                return True
+
+            bar.connect("draw", draw)
+            GLib.timeout_add(16, tick)
+            return bar
+
+        if layout == "left":
+            # ── sidebar ───────────────────────────────────────────
+            sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            sidebar.get_style_context().add_class("header")
+            sidebar.set_size_request(90, -1)
+            root.pack_start(sidebar, False, False, 0)
+
+            icon_pos = CFG["logo"].get("sidebar_position", "bottom")
+
+            logo_widget.set_margin_start(5); logo_widget.set_margin_end(5)
+            if icon_pos == "top":
+                logo_widget.set_margin_top(20)
+                sidebar.pack_start(logo_widget, False, False, 0)
+
+            text_area = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
+            text_area.set_valign(Gtk.Align.CENTER)
+            text_area.set_margin_top(24); text_area.set_margin_bottom(24)
+            sidebar.pack_start(text_area, True, True, 0)
+
+            t = Gtk.Label(label=f"{os_name}  ·  {_APP_VER}")
+            t.get_style_context().add_class("distro")
+            t.set_angle(90)
+            text_area.pack_start(t, False, False, 0)
+
+            s = Gtk.Label(label=date_str_slim)
+            s.get_style_context().add_class("fetched")
+            s.set_angle(90)
+            text_area.pack_start(s, False, False, 0)
+
+            if icon_pos != "top":
+                logo_widget.set_margin_bottom(20)
+                sidebar.pack_end(logo_widget, False, False, 0)
+
+            if GB["enabled"]:
+                root.pack_start(make_grad_bar(vertical=True), False, False, 0)
+            else:
+                root.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 0)
+
+        else:
+            # ── top header ────────────────────────────────────────
+            header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=18)
+            header.get_style_context().add_class("header")
+            header.set_margin_top(24); header.set_margin_bottom(24)
+            header.set_margin_start(36); header.set_margin_end(36)
+            root.pack_start(header, False, False, 0)
+
+            logo_widget.set_margin_top(5); logo_widget.set_margin_bottom(5)
+            logo_widget.set_margin_start(5); logo_widget.set_margin_end(5)
+            header.pack_start(logo_widget, False, False, 0)
+
+            hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+            hbox.set_valign(Gtk.Align.CENTER)
+            hbox.set_margin_start(15)
+            header.pack_start(hbox, True, True, 0)
+
+            t = Gtk.Label(label=f"{os_name}  ·  {_APP_VER}")
+            t.get_style_context().add_class("distro")
+            t.set_halign(Gtk.Align.START)
+            hbox.pack_start(t, False, False, 0)
+
+            s = Gtk.Label(label=date_str)
+            s.get_style_context().add_class("fetched")
+            s.set_halign(Gtk.Align.START)
+            hbox.pack_start(s, False, False, 0)
+
+            if GB["enabled"]:
+                root.pack_start(make_grad_bar(vertical=False), False, False, 0)
+            else:
+                root.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0)
+
+        # body ────────────────────────────────────────────────────
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        outer.set_margin_top(12); outer.set_margin_bottom(20)
+        body_overlay.add(outer)
+        root.pack_start(body_overlay, True, True, 0)
+
+        # inner container de ancho fijo, centrado
+        body = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        body.set_size_request(580, -1)
+        body.set_halign(Gtk.Align.CENTER)
+        outer.pack_start(body, True, True, 0)
+
+        def add_section(title, rows):
+            lbl = Gtk.Label(label=f"── {title} ──")
+            lbl.get_style_context().add_class("section")
+            lbl.set_halign(Gtk.Align.CENTER)
+            lbl.set_margin_top(16); lbl.set_margin_bottom(6)
+            body.pack_start(lbl, False, False, 0)
+
+            grid = Gtk.Grid()
+            grid.set_row_spacing(6)
+            grid.set_column_spacing(16)
+            grid.set_halign(Gtk.Align.START)
+            body.pack_start(grid, False, False, 0)
+
+            for i, row in enumerate(rows):
+                # row = (icon, key, value)  or  (icon, key, value, pct_str, extra)
+                icon, key, value = row[0], row[1], row[2]
+                pct   = row[3] if len(row) > 3 else None
+                extra = row[4] if len(row) > 4 else None
+
+                ic_lbl = Gtk.Label(label=icon + " ")
+                ic_lbl.get_style_context().add_class("icon")
+                ic_lbl.set_halign(Gtk.Align.END)
+                grid.attach(ic_lbl, 0, i, 1, 1)
+
+                k_lbl = Gtk.Label(label=key)
+                k_lbl.get_style_context().add_class("key")
+                k_lbl.set_halign(Gtk.Align.START)
+                k_lbl.set_size_request(90, -1)
+                grid.attach(k_lbl, 1, i, 1, 1)
+
+                val_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+                grid.attach(val_box, 2, i, 1, 1)
+
+                v_lbl = Gtk.Label(label=value)
+                v_lbl.get_style_context().add_class("val")
+                v_lbl.set_halign(Gtk.Align.START)
+                v_lbl.set_selectable(True)
+                v_lbl.set_can_focus(False)
+                val_box.pack_start(v_lbl, False, False, 0)
+
+                if pct:
+                    p_lbl = Gtk.Label(label=f"({pct})")
+                    p_lbl.get_style_context().add_class(pct_class(pct))
+                    val_box.pack_start(p_lbl, False, False, 0)
+
+                if extra:
+                    e_lbl = Gtk.Label(label=extra)
+                    e_lbl.get_style_context().add_class("fetched")
+                    e_lbl.set_halign(Gtk.Align.START)
+                    val_box.pack_start(e_lbl, False, False, 0)
+
+        for title, rows in sections_data:
+            add_section(title, rows)
+
+        self.connect("destroy", Gtk.main_quit)
+
+
+class AboutVersion(Gtk.Window):
+    def __init__(self):
+        super().__init__(title=_APP_ABOUT)
+        self.set_default_size(420, 0)
+        self.set_resizable(False)
+        self.set_position(Gtk.WindowPosition.CENTER)
+
+        self.set_border_width(0)
+
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CSS)
+        display = Gdk.Display.get_default()
+        screen = display.get_default_screen() if display else Gdk.Screen.get_default()
+        Gtk.StyleContext.add_provider_for_screen(
+            screen, provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        root.get_style_context().add_class("ver-box")
+        self.add(root)
+
+        # ── avatar + nombre ──────────────────────────────────────
+        top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        top.set_margin_top(36); top.set_margin_bottom(24)
+        top.set_margin_start(40); top.set_margin_end(40)
+        top.set_halign(Gtk.Align.CENTER)
+        root.pack_start(top, False, False, 0)
+
+        # icono de app (logo Arch) ────────────────────────────────
+        icon_theme = Gtk.IconTheme.get_default()
+        icon_theme.append_search_path("/usr/share/icons/Papirus")
+        app_img = Gtk.Image.new_from_icon_name("distributor-logo-archlinux", Gtk.IconSize.INVALID)
+        app_img.set_pixel_size(80)
+        top.pack_start(app_img, False, False, 0)
+
+        name_lbl = Gtk.Label(label=_APP)
+        name_lbl.get_style_context().add_class("ver-name")
+        top.pack_start(name_lbl, False, False, 0)
+
+        ver_lbl = Gtk.Label(label=_VER_LBL)
+        ver_lbl.get_style_context().add_class("ver-sub")
+        top.pack_start(ver_lbl, False, False, 0)
+
+        desc_lbl = Gtk.Label(label="System info viewer for Arch / Hyprland")
+        desc_lbl.get_style_context().add_class("ver-desc")
+        top.pack_start(desc_lbl, False, False, 0)
+
+        root.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0)
+
+        # ── autor ────────────────────────────────────────────────
+        author_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        author_box.set_halign(Gtk.Align.CENTER)
+        author_box.set_margin_top(20); author_box.set_margin_bottom(20)
+        root.pack_start(author_box, False, False, 0)
+
+        user_img = Gtk.Image.new_from_icon_name("system-users", Gtk.IconSize.INVALID)
+        user_img.set_pixel_size(32)
+        author_box.pack_start(user_img, False, False, 0)
+
+        author_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        author_box.pack_start(author_vbox, False, False, 0)
+
+        author_lbl = Gtk.Label(label="Víctor Sosa")
+        author_lbl.get_style_context().add_class("ver-author")
+        author_lbl.set_halign(Gtk.Align.START)
+        author_vbox.pack_start(author_lbl, False, False, 0)
+
+        role_lbl = Gtk.Label(label="Developer")
+        role_lbl.get_style_context().add_class("ver-sub")
+        role_lbl.set_halign(Gtk.Align.START)
+        author_vbox.pack_start(role_lbl, False, False, 0)
+
+        root.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 0)
+
+        # ── botones de enlaces ───────────────────────────────────
+        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        btn_box.set_halign(Gtk.Align.CENTER)
+        btn_box.set_margin_top(20); btn_box.set_margin_bottom(28)
+        root.pack_start(btn_box, False, False, 0)
+
+        def open_url(_, url):
+            subprocess.Popen(["xdg-open", url])
+
+        github_btn = Gtk.Button()
+        gh_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        gh_icon = Gtk.Image.new_from_icon_name("system-software-install", Gtk.IconSize.MENU)
+        gh_lbl  = Gtk.Label(label="GitHub")
+        gh_box.pack_start(gh_icon, False, False, 0)
+        gh_box.pack_start(gh_lbl,  False, False, 0)
+        github_btn.add(gh_box)
+        github_btn.get_style_context().add_class("link-btn")
+        github_btn.get_style_context().add_class("link-btn-github")
+        github_btn.connect("clicked", open_url, "https://github.com/victorsosaMx/vsFetch")
+        btn_box.pack_start(github_btn, False, False, 0)
+
+        web_btn = Gtk.Button()
+        web_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        web_icon = Gtk.Image.new_from_icon_name("applications-internet", Gtk.IconSize.MENU)
+        web_lbl  = Gtk.Label(label="victorsosa.com")
+        web_box.pack_start(web_icon, False, False, 0)
+        web_box.pack_start(web_lbl,  False, False, 0)
+        web_btn.add(web_box)
+        web_btn.get_style_context().add_class("link-btn")
+        web_btn.get_style_context().add_class("link-btn-web")
+        web_btn.connect("clicked", open_url, "https://victorsosa.com/")
+        btn_box.pack_start(web_btn, False, False, 0)
+
+        self.connect("destroy", Gtk.main_quit)
+
+
+if VERSION:
+    win = AboutVersion()
+else:
+    win = AboutSystem()
+win.show_all()
+Gtk.main()

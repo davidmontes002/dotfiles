@@ -1,0 +1,368 @@
+;; ── CLOCK ──────────────────────────────────────────────
+(defpoll hours :interval "1s"
+  `date +"%H"`)
+
+(defpoll minutes :interval "1s"
+  `date +"%M"`)
+
+(defpoll date :interval "60s"
+  `date +"%a %d %b"`)
+
+(defwidget clock-widget []
+  (box :class "clock-box"
+       :orientation "v"
+       :space-evenly false
+       :halign "end"
+       :valign "end"
+    (box :class "clock-time-row"
+         :orientation "h"
+         :space-evenly false
+         :halign "end"
+         :valign "baseline"
+      (label :class "clock-hh" :text hours)
+      (label :class "clock-colon" :text ":")
+      (label :class "clock-mm" :text minutes))
+    (label :class "clock-date" :text date :halign "end")))
+
+(defwindow clock
+  :monitor 1
+  :geometry (geometry
+    :x "24px"
+    :y "24px"
+    :width "360px"
+    :height "120px"
+    :anchor "bottom right")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :transparent true
+  (clock-widget))
+
+;; ── SYSMONITOR ──────────────────────────────────────────
+
+(defpoll fetch-os    :interval "100000s" `scripts/fetch os`)
+(defpoll fetch-wm    :interval "100000s" `scripts/fetch wm`)
+(defpoll fetch-shell :interval "100000s" `scripts/fetch shell`)
+
+;; Datos RAM
+(defpoll ram-detail :interval "3s"
+  `free -m | awk 'NR==2{printf "%.1f / %.0f GB", $3/1024, $2/1024}'`)
+
+;; Datos CPU
+(defpoll cpu-detail :interval "10s"
+  `nproc | awk '{printf "%d cores", $1}'`)
+
+;; Datos discos
+(defpoll disk-root-used :interval "30s"
+  `df -h / | awk 'NR==2{print $3" / "$2}'`)
+
+(defpoll disk-win-pct :interval "60s" :initial "0"
+  `df /run/media/Windows 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
+
+(defpoll disk-win-used :interval "60s"
+  `df -h /run/media/Windows 2>/dev/null | awk 'NR==2{print $3" / "$2}' || echo "N/A"`)
+
+(defpoll disk-storage-pct :interval "60s" :initial "0"
+  `df /run/media/Storage 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
+
+(defpoll disk-storage-used :interval "60s"
+  `df -h /run/media/Storage 2>/dev/null | awk 'NR==2{print $3" / "$2}' || echo "N/A"`)
+
+;; Barra horizontal para CPU/RAM
+(defwidget stat-row [name pct detail fill-class]
+  (box :class "stat-row"
+       :orientation "v"
+       :space-evenly false
+    (label :class "stat-header" :text "${name}  ${detail}")
+    (scale :class "stat-bar ${fill-class}"
+           :value pct
+           :min 0
+           :max 100
+           :orientation "h"
+           :sensitive false)))
+
+(defwidget disk-row [icon name pct fill-class]
+  (box :class "stat-row"
+       :orientation "v"
+       :space-evenly false
+    (label :class "stat-header" :text "${icon} ${name}  ${pct}%")
+    (scale :class "stat-bar ${fill-class}"
+           :value pct
+           :min 0
+           :max 100
+           :orientation "h"
+           :sensitive false)))
+
+;; Widget principal
+(defwidget sysmonitor []
+  (box :class "monitor-box"
+       :orientation "v"
+       :space-evenly false
+    (box :class "monitor-header" :space-evenly false :halign "start" :valign "center"
+      (label :class "fetch-logo" :text "󰣇" :valign "center")
+      (box :class "fetch-titles" :orientation "v" :space-evenly false :valign "center"
+        (label :class "fetch-label" :text "os" :halign "start")
+        (label :class "fetch-label" :text "wm" :halign "start")
+        (label :class "fetch-label" :text "sh" :halign "start"))
+      (box :class "fetch-values" :orientation "v" :space-evenly false :valign "center"
+        (label :class "fetch-value" :text "${fetch-os}"    :truncate false :halign "start")
+        (label :class "fetch-value" :text "${fetch-wm}"    :truncate false :halign "start")
+        (label :class "fetch-value" :text "${fetch-shell}" :truncate false :halign "start")))
+    (box :class "monitor-divider")
+    (stat-row :name "CPU"
+              :pct  {round(EWW_CPU.avg, 0)}
+              :detail "${round(EWW_CPU.avg, 0)}%  ${cpu-detail}"
+              :fill-class "fill-blue")
+    (stat-row :name "RAM"
+              :pct  {round(EWW_RAM.used_mem_perc, 0)}
+              :detail {ram-detail}
+              :fill-class "fill-purple")
+    (box :class "monitor-divider")
+    (label :class "storage-label" :text "STORAGE" :truncate false)
+    (disk-row :icon "󰋊" :name "ROOT"
+              :pct {round(EWW_DISK["/"].used_perc, 0)}
+              :fill-class "fill-green")
+    (disk-row :icon "󰍲" :name "WIN"
+              :pct {disk-win-pct}
+              :fill-class "fill-yellow")
+    (disk-row :icon "󰋩" :name "NAS"
+              :pct {disk-storage-pct}
+              :fill-class "fill-orange")))
+
+(defwindow sysinfo
+  :monitor 0
+  :geometry (geometry
+    :x "10px"
+    :y "8px"
+    :width "325px"
+    :height "320px"
+    :anchor "top right")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  (sysmonitor))
+
+;; ── SIDEBAR ─────────────────────────────────────────────────
+
+;; Polls
+(defpoll sb-time     :interval "1s"   `date +"%H:%M"`)
+(defpoll sb-date     :interval "60s"  `date +"%a %d %b"`)
+(defpoll sb-wm       :interval "1h"   `$HOME/.config/scripts/display.sh`)
+(defpoll sb-shell    :interval "1h"   `echo $SHELL | awk -F'/' '{print $NF}'`)
+(defpoll sb-uptime   :interval "1m"   `$HOME/.config/scripts/uptime.sh`)
+(defpoll sb-updates  :interval "10m"  `$HOME/.config/scripts/updates.sh`)
+(defpoll sb-memory   :interval "5s"  :initial "0" `$HOME/.config/scripts/memory`)
+(defpoll sb-cpu      :interval "3s"  :initial "0" `$HOME/.config/scripts/cpu`)
+(defpoll sb-disk     :interval "30s" :initial "0" `$HOME/.config/scripts/disk`)
+(defpoll sb-tempe    :interval "5s"  :initial "0" `$HOME/.config/scripts/tempe`)
+(defpoll sb-ip       :interval "1h"   `ip -br address | grep UP | grep -v lo | awk '{print $3}' | cut -d/ -f1 | head -1`)
+(deflisten sb-net    :initial '{"down": 0, "up": 0}'  `$HOME/.config/scripts/network`)
+
+(defpoll sb-wtemp    :interval "1h" :initial "..." `$HOME/.config/scripts/Weather.sh current_temp`)
+(defpoll sb-wdesc    :interval "1h"               `$HOME/.config/scripts/Weather.sh weather_desc`)
+(defpoll sb-wfeel    :interval "3h"               `$HOME/.config/scripts/Weather.sh feels_like`)
+(defpoll sb-whumid   :interval "3h"               `$HOME/.config/scripts/Weather.sh humidity`)
+(defpoll sb-wicon    :interval "3h"               `$HOME/.config/scripts/Weather.sh icon`)
+(defpoll sb-wwind    :interval "3h"               `$HOME/.config/scripts/Weather.sh wind`)
+
+;; Calendar + Clock
+(defwidget sb-cal []
+  (box :class "sb-cal-box" :orientation "v" :space-evenly false :halign "center"
+    (label :class "sb-time" :text sb-time)
+    (label :class "sb-date" :text sb-date)
+    (calendar :class "sb-calendar"
+              :day {formattime(EWW_TIME, "%d")}
+              :month {formattime(EWW_TIME, "%m")}
+              :year {formattime(EWW_TIME, "%Y")})))
+
+;; Header: igual al sysinfo anterior
+(defwidget sb-header []
+  (box :class "monitor-header" :space-evenly false :halign "start" :valign "center"
+    (label :class "fetch-logo" :text "󰣇" :valign "center")
+    (box :class "fetch-titles" :orientation "v" :space-evenly false :valign "center"
+      (label :class "fetch-label" :text "os" :halign "start")
+      (label :class "fetch-label" :text "wm" :halign "start")
+      (label :class "fetch-label" :text "sh" :halign "start"))
+    (box :class "fetch-values" :orientation "v" :space-evenly false :valign "center"
+      (label :class "fetch-value" :text "${fetch-os}"    :truncate false :halign "start")
+      (label :class "fetch-value" :text "${fetch-wm}"    :truncate false :halign "start")
+      (label :class "fetch-value" :text "${fetch-shell}" :truncate false :halign "start"))))
+
+;; Circular progress: CPU + RAM
+;; Circular progress: CPU + RAM + TEMP en una fila
+(defwidget sb-system []
+  (box :class "sb-sys-box" :orientation "h" :space-evenly true
+    (box :class "sb-ring-box" :orientation "v" :space-evenly false
+      (overlay
+        (circular-progress :value sb-cpu :class "sb-ring-cpu" :thickness 8
+          (label :class "sb-ring-spacer" :text ""))
+        (label :class "sb-ring-icon-cpu" :halign "center" :valign "center" :text "⚙"))
+      (label :class "sb-ring-perc-cpu" :halign "center" :text "CPU ${sb-cpu}%"))
+    (box :class "sb-ring-box" :orientation "v" :space-evenly false
+      (overlay
+        (circular-progress :value sb-memory :class "sb-ring-mem" :thickness 8
+          (label :class "sb-ring-spacer" :text ""))
+        (label :class "sb-ring-icon-mem" :halign "center" :valign "center" :text "▦"))
+      (label :class "sb-ring-perc-mem" :halign "center" :text "RAM ${sb-memory}%"))
+    (box :class "sb-ring-box" :orientation "v" :space-evenly false
+      (overlay
+        (circular-progress :value sb-tempe :class "sb-ring-temp" :thickness 8
+          (label :class "sb-ring-spacer" :text ""))
+        (label :class "sb-ring-icon-temp" :halign "center" :valign "center" :text "🌡"))
+      (label :class "sb-ring-perc-temp" :halign "center" :text "TEMP ${sb-tempe}°C"))))
+
+;; Barras de disco (del sysinfo anterior)
+(defwidget sb-storage []
+  (box :class "sb-storage" :orientation "v" :space-evenly false
+    (label :class "storage-label" :text "STORAGE" :truncate false)
+    (disk-row :icon "󰋊" :name "ROOT"
+              :pct {round(EWW_DISK["/"].used_perc, 0)}
+              :fill-class "fill-green")
+    (disk-row :icon "󰍲" :name "WIN"
+              :pct {disk-win-pct}
+              :fill-class "fill-yellow")
+    (disk-row :icon "󰋩" :name "NAS"
+              :pct {disk-storage-pct}
+              :fill-class "fill-orange")))
+
+;; Weather
+(defwidget sb-weather []
+  (box :class "sb-weather-box" :orientation "v" :space-evenly false :halign "center"
+    (box :orientation "h" :space-evenly false :halign "center" :spacing 10
+      (label :class "sb-weather-icon" :text sb-wicon)
+      (label :class "sb-weather-temp" :text "${sb-wtemp}°C"))
+    (box :orientation "v" :space-evenly false :spacing 2
+      (label :class "sb-weather-desc" :text sb-wdesc :limit-width 24 :justify "center" :wrap true)
+      (label :class "sb-weather-detail" :halign "center" :text " ${sb-wfeel}°C  󰖑 ${sb-whumid}%")
+      (label :class "sb-weather-detail" :halign "center" :text "󰖝 ${sb-wwind} km/h"))))
+
+;; Network
+(defwidget sb-network []
+  (box :class "sb-net-box" :orientation "v" :space-evenly false :halign "center"
+    (label :class "sb-net-ip" :text "${sb-ip}")
+    (box :orientation "h" :space-evenly false :spacing 6 :halign "center"
+      (label :text "⬆" :class "sb-net-up-icon")
+      (box :width 200
+        (graph :class "sb-net-graph-up"
+               :thickness 2
+               :value {sb-net.up}
+               :time-range "30s" :min 0
+               :dynamic true :line-style "round")))
+    (box :orientation "h" :space-evenly false :spacing 6 :halign "center"
+      (label :text "⬇" :class "sb-net-down-icon")
+      (box :width 200
+        (graph :class "sb-net-graph-down"
+               :thickness 2
+               :value {sb-net.down}
+               :time-range "30s" :min 0
+               :dynamic true :line-style "round")))))
+
+;; Divider
+(defwidget sb-sep []
+  (box :class "sb-sep"))
+
+;; App Launchers
+(defpoll ICONS :interval "8760h" `echo "$HOME/Imágenes/icons/eww"`)
+
+(defwidget sb-launchers []
+  (box :class "sb-launchers" :orientation "v" :space-evenly false
+    (box :orientation "h" :space-evenly true
+      (button :class "sb-launcher-btn" :tooltip "Launcher"
+              :onclick "rofi -show drun -theme ~/.config/rofi/launchpad.rasi &"
+        (image :path "${ICONS}/launcher.svg"    :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Firefox"
+              :onclick "firefox &"
+        (image :path "${ICONS}/Firefox.png"     :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Dolphin"
+              :onclick "dolphin &"
+        (image :path "${ICONS}/Dolphin.svg"     :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Terminal"
+              :onclick "kitty --directory ~ &"
+        (image :path "${ICONS}/Terminal.svg"    :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "VSCode"
+              :onclick "code &"
+        (image :path "${ICONS}/vscode.png"      :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Antigravity"
+              :onclick "/usr/bin/antigravity &"
+        (image :path "${ICONS}/antigravity.png" :image-width 30 :image-height 30)))
+    (box :orientation "h" :space-evenly true :style "margin-top: 6px;"
+      (button :class "sb-launcher-btn" :tooltip "VMware Player"
+              :onclick "/usr/bin/vmplayer &"
+        (image :path "${ICONS}/vmware.png"      :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Teams"
+              :onclick "brave --app=\"https://teams.microsoft.com/v2/\" --class=WebApp-MSTeams3980 --user-data-dir=$HOME/.local/share/ice/profiles/MSTeams3980 &"
+        (image :path "${ICONS}/teams.png"       :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "ChatGPT"
+              :onclick "brave --class=webapp-chatgpt --app=https://chatgpt.com &"
+        (image :path "${ICONS}/chatgtp.png"     :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Claude"
+              :onclick "kitty -e claude &"
+        (image :path "${ICONS}/claude.svg"      :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "Thunderbird"
+              :onclick "thunderbird &"
+        (image :path "${ICONS}/thunderbird.svg" :image-width 30 :image-height 30))
+      (button :class "sb-launcher-btn" :tooltip "YouTube"
+              :onclick "sh -c 'XAPP_FORCE_GTKWINDOW_ICON=\"$HOME/Imágenes/icons/ytube.png\" firefox --class WebApp-YouTube3674 --name WebApp-YouTube3674 --profile $HOME/.local/share/ice/firefox/YouTube3674 --no-remote \"https://www.youtube.com\"' &"
+        (image :path "${ICONS}/ytube.png"       :image-width 30 :image-height 30)))
+))
+
+;; Main sidebar container - monitor grande (con clima)
+(defwidget sidebar-content []
+  (box :class "sb-main" :orientation "v" :space-evenly false
+    (sb-header)
+    (box :class "monitor-divider")
+    (sb-cal)
+    (sb-sep)
+    (sb-system)
+    (box :class "monitor-divider")
+    (sb-storage)
+    (sb-sep)
+    (sb-weather)
+    (sb-sep)
+    (sb-network)
+    (sb-sep)
+    (sb-launchers)))
+
+;; Sidebar compacto - monitor pequeño (sin clima)
+(defwidget sidebar-content-compact []
+  (box :class "sb-main" :orientation "v" :space-evenly false
+    (sb-header)
+    (box :class "monitor-divider")
+    (sb-cal)
+    (sb-sep)
+    (sb-system)
+    (box :class "monitor-divider")
+    (sb-storage)
+    (sb-sep)
+    (sb-network)
+    (sb-sep)
+    (sb-launchers)))
+
+(defwindow sidebar
+  :monitor 0
+  :geometry (geometry
+    :x "10px"
+    :y "8px"
+    :width "380px"
+    :height "90%"
+    :anchor "top right")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  (sidebar-content))
+
+;; Monitor 0 compacto (resolución < 1440p)
+(defwindow sidebar-compact
+  :monitor 0
+  :geometry (geometry
+    :x "10px"
+    :y "8px"
+    :width "380px"
+    :height "90%"
+    :anchor "top right")
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  (sidebar-content-compact))
+
+

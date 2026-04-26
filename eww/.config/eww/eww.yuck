@@ -1,9 +1,0 @@
-(include "variables.yuck")
-(include "windows.yuck")
-
-(include "control_center/control_center.yuck")
-(include "control_center/charts.yuck")
-(include "control_center/volume.yuck")
-(include "control_center/notifications.yuck")
-(include "control_center/notifications_popup.yuck")
-(include "power/powermenu.yuck")
