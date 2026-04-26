@@ -13,7 +13,7 @@ WPDIR="$THEME_PATH/wallpapers"
 [[ -d "$WPDIR" ]] || { notify-send "Wallpaper Picker" "No hay wallpapers para el tema '$theme'.\nCópialos a:\n$WPDIR" -i dialog-warning; exit 1; }
 
 mapfile -d '' -t files < <(
-  find "$WPDIR" -maxdepth 1 -type f \
+  find "$WPDIR" -maxdepth 1 -type f -o -type l \
     \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
     -printf '%f\0' | sort -z
 )

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# =============================================================================
+# dot-sync: Sincronización automática de Dotfiles para David Iram
+# =============================================================================
+
+REPO_DIR="$HOME/dotfiles"
+
+# Entrar al repositorio
+cd "$REPO_DIR" || { echo "❌ Error: No se pudo acceder a $REPO_DIR"; exit 1; }
+
+echo "📥 Verificando cambios en el servidor remoto..."
+git pull
+
+# Comprobar si hay algo que subir
+if [[ -z $(git status --porcelain) ]]; then
+    echo "✨ Todo está al día. No hay cambios locales que subir."
+    exit 0
+fi
+
+echo "📝 Cambios locales detectados:"
+git status -s
+
+# Pedir mensaje de commit
+read -p "Introduce un mensaje para el commit (Enter para usar fecha actual): " msg
+
+if [[ -z "$msg" ]]; then
+    msg="Sincronización automática: $(date '+%Y-%m-%d %H:%M:%S')"
+fi
+
+# Ejecutar la subida
+echo "🚀 Subiendo cambios a GitHub..."
+git add .
+git commit -m "$msg"
+git push
+
+echo "✅ ¡Proceso completado con éxito!"

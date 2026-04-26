@@ -27,7 +27,7 @@ if [[ "$THEME" == "dynamic" ]]; then
 
     # Graphical selector (inspired by Super+W wallpaper-picker)
     mapfile -d '' -t files < <(
-      find "$WP_DIR" -maxdepth 1 -type f \
+      find "$WP_DIR" -maxdepth 1 -type f -o -type l \
         \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
         -printf '%f\0' | sort -z
     )
