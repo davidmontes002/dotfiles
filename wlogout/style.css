@@ -1,5 +1,5 @@
 * {
-  font-family: JetBrainsMono Nerd Font, sans-serif;
+  font-family: JetBrainsMono Nerd Font Mono, sans-serif;
   font-size: 17px;
   box-shadow: none;
   transition: 20ms;
@@ -11,9 +11,9 @@ window {
 }
 
 button {
-  color: #c9d1d9;
+  color: #d1d1c1;
   border-radius: 16px;
-  border: 1px solid #58a6ff;
+  border: 1px solid #c2bda6;
   background-color: transparent;
   box-shadow: inset 2px 2px 14px rgba(255,255,255,0.08),
               inset 0 1px 2px rgba(255,255,255,0.1);
@@ -31,10 +31,10 @@ button {
 }
 
 button:hover {
-  border: 1px solid #58a6ff;
-  background-color: rgba(22,27,34,0.70);
+  border: 1px solid #c2bda6;
+  background-color: rgba(90,86,74,0.70);
   background-size: 30%;
-  box-shadow: 0 0 30px #58a6ff;
+  box-shadow: 0 0 30px #c2bda6;
   opacity: 0.9;
 }
 
@@ -64,5 +64,5 @@ button:hover {
 
 label {
   margin-top: 4px;
-  color: #c9d1d9;
+  color: #d1d1c1;
 }

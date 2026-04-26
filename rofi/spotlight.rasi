@@ -4,19 +4,19 @@ configuration {
     icon-theme:          "hicolor";
     drun-display-format: "{name}";
     display-drun:        "";
-    font:                "JetBrainsMono Nerd Font 14";
+    font:                "JetBrainsMono Nerd Font Mono 14";
     terminal:            "kitty";
 }
 
 * {
-    bg:      #0d1117;
-    bg-sel:  #161b22;
-    fg:      #c9d1d9;
-    fg-dim:  #30363d;
+    bg:      #2d2d2b;
+    bg-sel:  #5a564a;
+    fg:      #d1d1c1;
+    fg-dim:  #8b8678;
 
     background-color: transparent;
     text-color:       @fg;
-    border-color:     #21262d;
+    border-color:     #706c5e;
     spacing:          0;
     padding:          0;
     margin:           0;
@@ -42,7 +42,7 @@ mainbox {
 inputbar {
     background-color: transparent;
     border:           0 0 1px 0;
-    border-color:     #21262d;
+    border-color:     #706c5e;
     padding:          16px 18px;
     spacing:          10px;
     children:         [entry];

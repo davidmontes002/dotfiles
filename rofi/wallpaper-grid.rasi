@@ -6,11 +6,11 @@ configuration {
 }
 
 * {
-    bg:      #0d1117;
-    bg-alt:  #161b22;
-    fg:      #c9d1d9;
-    fg-dim:  #30363d;
-    sel:     #58a6ff;
+    bg:      #2d2d2b;
+    bg-alt:  #5a564a;
+    fg:      #d1d1c1;
+    fg-dim:  #8b8678;
+    sel:     #c2bda6;
 
     background-color: transparent;
     text-color:       @fg;
@@ -23,7 +23,7 @@ configuration {
 window {
     background-color: @bg;
     border:           2px;
-    border-color:     #21262d;
+    border-color:     #706c5e;
     border-radius:    20px;
     width:            900px;
     height:           600px;
