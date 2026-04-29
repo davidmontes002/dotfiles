@@ -6,7 +6,7 @@ import urllib.error
 import sys
 
 API_KEY = "21475691915fdff68122ceca2651cd6e"
-CITY = "Monterrey"
+CITY = "Los+Mochis"
 URL = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric&lang=es"
 
 def main():

@@ -3,14 +3,14 @@
 @import "~/.config/rofi/config.rasi"
 
 * {
-    bg:      #2d2d2b;
-    bg-sel:  #5a564a;
-    fg:      #d1d1c1;
-    fg-dim:  #8b8678;
+    bg:      #1f2328;
+    bg-sel:  #2b3036;
+    fg:      #d0d4d9;
+    fg-dim:  #444b53;
 
     background-color: transparent;
     text-color:       @fg;
-    border-color:     #706c5e;
+    border-color:     #31363d;
     spacing:          0;
     padding:          0;
     margin:           0;
@@ -34,7 +34,7 @@ mainbox {
 inputbar {
     background-color: transparent;
     border:           0 0 1px 0;
-    border-color:     #706c5e;
+    border-color:     #31363d;
     margin:           0 0 4px 0;
     border-radius:    8px;
 }

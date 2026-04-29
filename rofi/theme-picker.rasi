@@ -2,7 +2,7 @@
 @import "~/.config/rofi/config.rasi"
 
 * {
-    accent: #c2bda6;
+    accent: #8fa1b3;
 }
 
 configuration {
@@ -17,7 +17,7 @@ window {
     border: 0;
     border-radius: 20px;
     padding: 0;
-    background-color: #2d2d2bf2;
+    background-color: #1f2328f2;
     location: center;
     anchor: center;
 }
@@ -50,7 +50,7 @@ element {
 }
 
 element selected.normal {
-    background-color: #c2bda633;
+    background-color: #8fa1b333;
     border: 2px;
     border-color: @accent;
 }
@@ -64,8 +64,8 @@ element-icon {
 element-text {
     horizontal-align: 0.5;
     vertical-align: 0.5;
-    text-color: #d1d1c1;
-    font: "JetBrainsMono Nerd Font Mono 12";
+    text-color: #d0d4d9;
+    font: "JetBrainsMono Nerd Font 12";
 }
 
 element selected.normal element-text {

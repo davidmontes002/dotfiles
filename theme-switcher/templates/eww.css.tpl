@@ -58,11 +58,11 @@ window, window.background, #clock, #sysinfo {
     text-shadow: 0px 1px 8px rgba(0, 0, 0, 0.9);
 }
 
-/* ── MONITOR BOX ────────────────────────── */
-.monitor-box {
-    background-color: {{bg}};
+/* ── MONITOR BOX & SIDEBAR ────────────────────────── */
+.monitor-box, .sb-main {
+    background-color: alpha({{bg}}, 0.85);
     border-radius: 16px;
-    border: 1px solid {{surface}};
+    border: 1px solid alpha({{surface}}, 0.5);
     padding: 16px 16px;
 }
 

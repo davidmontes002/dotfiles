@@ -53,20 +53,11 @@
   `nproc | awk '{printf "%d cores", $1}'`)
 
 ;; Datos discos
-(defpoll disk-root-used :interval "30s"
-  `df -h / | awk 'NR==2{print $3" / "$2}'`)
+(defpoll disk-home-pct :interval "60s" :initial "0"
+  `df /home 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
 
-(defpoll disk-win-pct :interval "60s" :initial "0"
-  `df /run/media/Windows 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
-
-(defpoll disk-win-used :interval "60s"
-  `df -h /run/media/Windows 2>/dev/null | awk 'NR==2{print $3" / "$2}' || echo "N/A"`)
-
-(defpoll disk-storage-pct :interval "60s" :initial "0"
-  `df /run/media/Storage 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
-
-(defpoll disk-storage-used :interval "60s"
-  `df -h /run/media/Storage 2>/dev/null | awk 'NR==2{print $3" / "$2}' || echo "N/A"`)
+(defpoll disk-games-pct :interval "60s" :initial "0"
+  `df /mnt/Games 2>/dev/null | awk 'NR==2{print int($3/$2*100)}' || echo 0`)
 
 ;; Barra horizontal para CPU/RAM
 (defwidget stat-row [name pct detail fill-class]
@@ -119,14 +110,14 @@
               :fill-class "fill-purple")
     (box :class "monitor-divider")
     (label :class "storage-label" :text "STORAGE" :truncate false)
-    (disk-row :icon "󰋊" :name "ROOT"
+      (disk-row :icon "󰋊" :name "ROOT"
               :pct {round(EWW_DISK["/"].used_perc, 0)}
               :fill-class "fill-green")
-    (disk-row :icon "󰍲" :name "WIN"
-              :pct {disk-win-pct}
+      (disk-row :icon "󰋜" :name "HOME"
+              :pct {disk-home-pct}
               :fill-class "fill-yellow")
-    (disk-row :icon "󰋩" :name "NAS"
-              :pct {disk-storage-pct}
+      (disk-row :icon "󰊋" :name "GAMES"
+              :pct {disk-games-pct}
               :fill-class "fill-orange")))
 
 (defwindow sysinfo
@@ -218,13 +209,12 @@
     (disk-row :icon "󰋊" :name "ROOT"
               :pct {round(EWW_DISK["/"].used_perc, 0)}
               :fill-class "fill-green")
-    (disk-row :icon "󰍲" :name "WIN"
-              :pct {disk-win-pct}
+    (disk-row :icon "󰋜" :name "HOME"
+              :pct {disk-home-pct}
               :fill-class "fill-yellow")
-    (disk-row :icon "󰋩" :name "NAS"
-              :pct {disk-storage-pct}
+    (disk-row :icon "󰊋" :name "GAMES"
+              :pct {disk-games-pct}
               :fill-class "fill-orange")))
-
 ;; Weather
 (defwidget sb-weather []
   (box :class "sb-weather-box" :orientation "v" :space-evenly false :halign "center"

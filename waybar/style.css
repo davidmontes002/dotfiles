@@ -1,18 +1,18 @@
 /* Catppuccin Mocha palette */
-@define-color base   #2d2d2b;
-@define-color mantle #454138;
-@define-color crust  #2d2d2b;
-@define-color surface0 #5a564a;
-@define-color surface1 #706c5e;
-@define-color overlay0 #8b8678;
-@define-color text   #d1d1c1;
-@define-color subtext0 #b5b5a5;
-@define-color blue   #6c6c66;
-@define-color mauve  #c2bda6;
-@define-color red    #ff6c60;
-@define-color green  #a8ff60;
-@define-color yellow #ffffb6;
-@define-color peach  #e0af68;
+@define-color base   #1f2328;
+@define-color mantle #24292f;
+@define-color crust  #1f2328;
+@define-color surface0 #2b3036;
+@define-color surface1 #31363d;
+@define-color overlay0 #444b53;
+@define-color text   #d0d4d9;
+@define-color subtext0 #8a9199;
+@define-color blue   #8fa1b3;
+@define-color mauve  #8fa1b3;
+@define-color red    #d67c7c;
+@define-color green  #8fbf8f;
+@define-color yellow #d4b97c;
+@define-color peach  #cfa070;
 
 * {
     font-family: "JetBrainsMono Nerd Font Mono", "JetBrains Mono", monospace;
@@ -30,7 +30,7 @@ window#waybar {
 .modules-left,
 .modules-center,
 .modules-right {
-    background: rgba(45,45,43,0.95);
+    background: rgba(31,35,40,0.95);
     border-radius: 12px;
     padding: 2px 8px;
     border: 1px solid @surface0;
@@ -65,19 +65,19 @@ window#waybar {
 }
 
 @keyframes ws-active {
-    0%   { background-color: #6c6c66; }
-    50%  { background-color: #c2bda6; }
-    100% { background-color: #6c6c66; }
+    0%   { background-color: #8fa1b3; }
+    50%  { background-color: #8fa1b3; }
+    100% { background-color: #8fa1b3; }
 }
 
 @keyframes ws-active {
-    0%   { background-color: #6c6c66; }
-    50%  { background-color: #c2bda6; }
-    100% { background-color: #6c6c66; }
+    0%   { background-color: #8fa1b3; }
+    50%  { background-color: #8fa1b3; }
+    100% { background-color: #8fa1b3; }
 }
 
 #workspaces button.active {
-    background-color: #6c6c66;
+    background-color: #8fa1b3;
     color: @base;
     font-weight: bold;
     animation: ws-active 3s linear infinite;
