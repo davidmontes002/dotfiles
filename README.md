@@ -1,191 +1,424 @@
-# Dotfiles Hyprland - Configuración completa de escritorio para Arch Linux
+# Dotfiles Hyprland
 
-Este repositorio contiene una configuración personalizada para el entorno de escritorio Hyprland en Arch Linux, diseñada para proporcionar una experiencia moderna, productiva y estéticamente agradable.
+Una configuración moderna, productiva y altamente personalizable para Arch Linux con Hyprland (Wayland).
 
-## 📋 Requisitos del sistema
+## Requisitos del sistema
 
-- Arch Linux o derivada (Manjaro, ArcoLinux, EndeavourOS, etc.)
-- Hardware compatible con aceleración gráfica (Intel/AMD/NVIDIA con drivers apropiados)
-- Conexión a internet para instalación de paquetes
-- Espacio en disco suficiente (mínimo 10 GB recomendados)
+- **Arch Linux** (no se garantiza funcionamiento en derivadas como Manjaro, EndeavourOS, etc.)
+- **Drivers de GPU** instalados y configurados previamente
+- **Conexión a internet** para instalación de paquetes
+- **Usuario con permisos sudo**
 
-## 📦 Dependencias necesarias
+---
 
-### Hyprland y componentes esenciales
-```bash
-hyprland hyprpaper hyprlock hypridle
-```
+## Instalación
 
-### Barra de estado y widgets
-```bash
-waybar wlogout
-```
+### Método automático (RECOMENDADO)
 
-### Aplicaciones
-```bash
-kitty rofi fastfetch jq
-```
-
-### Shell y temas
-```bash
-fish oh-my-posh-git
-```
-
-### Utilidades
-```bash
-eww matugen swole grim slurp gum
-```
-
-### Temas y iconos
-```bash
-adwaita-icon-theme papirus-icon-theme
-```
-
-### Fuentes
-```bash
-jetbrains-mono-nerd ttf-font-awesome otf-font-awesome
-```
-
-## ⬇️ Instalación
-
-### Método recomendado (enlaces simbólicos)
-Este método mantiene su configuración sincronizada con el repositorio:
+Este método instala todos los paquetes necesarios y configura automáticamente los dotfiles.
 
 ```bash
 # Clonar el repositorio
 git clone https://github.com/tu-usuario/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
-# Dar permisos de ejecución al instalador
-chmod +x install.sh
-
-# Ejecutar el instalador
-./install.sh
+# Ejecutar el instalador interactivo
+./bootstrap.sh
 ```
 
-### Opciones del instalador
-- `./install.sh` - Instalación normal con enlaces simbólicos
-- `./install.sh --dry-run` - Muestra qué haría sin realizar cambios
-- `./install.sh --backup-only` - Solo crea backup de configuraciones existentes
+El instalador te mostrará un menú:
 
-## 📂 Estructura de la configuración
+| Opción | Descripción |
+|--------|-------------|
+| `[1]` Instalación completa | Instala paquetes + configura dotfiles (recomendado) |
+| `[2]` Solo paquetes | Solo instala los paquetes del sistema |
+| `[3]` Solo dotfiles | Solo configura los enlaces simbólicos |
 
-Después de la instalación, encontrará los siguientes enlaces en `~/.config/`:
-- `hypr/` → Configuración de Hyprland (ventanas, teclado, monitores)
-- `waybar/` → Barra de estado con información del sistema
-- `fish/` → Shell interactiva con Oh My Posh
-- `kitty/` → Terminal emulator configurada
-- `rofi/` → Lanzador de aplicaciones y menús
-- `eww/` → Widgets personalizados en escritorio
-- Y muchos más componentes especializados
+### Opciones avanzadas
 
-## 🎨 Personalización
+```bash
+./bootstrap.sh --dry-run        # Simula la instalación sin hacer cambios
+./bootstrap.sh --pkgs-only      # Solo instala paquetes
+./bootstrap.sh --dotfiles       # Solo configura dotfiles
+```
 
-### Cambiar temas y colores
-Edite los archivos de tema en:
-- `~/.config/hypr/` para colores de Hyprland
-- `~/.config/waybar/` para estilo de la barra
-- `~/.config/oh-my-posh/` para temas de shell
+### Método manual (avanzado)
+
+Si prefieres instalar los paquetes manualmente:
+
+```bash
+# 1. Instalar paquetes (ver sección de dependencias)
+# 2. Clonar repositorio
+git clone https://github.com/tu-usuario/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+
+# 3. Ejecutar instalador de symlinks
+chmod +x install.sh
+./install.sh
+
+# 4. Post-instalación manual
+chsh -s /usr/bin/fish  # Cambiar shell a fish
+```
+
+---
+
+## Dependencias completas
+
+### Paquetes oficiales (pacman)
+
+```bash
+# Wayland / Hyprland
+hyprland hyprpaper hyprlock hypridle hyprswitch hyprpm
+
+# Barra de estado y notificaciones
+waybar wlogout swaync mako
+
+# Terminal y Shell
+kitty fish
+
+# Lanzadores
+rofi
+
+# Captura de pantalla y edición
+grim slurp swappy
+
+# Gestor de wallpapers
+swww
+
+# Widgets
+eww
+
+# Utilidades CLI
+fastfetch jq gum cliphist brightnessctl pamixer playerctl \
+wl-clipboard wl-paste polkit-gnome python3 imagemagick xdg-utils figlet eza
+
+# Red y Bluetooth
+networkmanager bluez blueberry
+
+# Audio (PipeWire)
+pipewire wireplumber
+
+# Temas e iconos
+adwaita-icon-theme papirus-icon-theme
+
+# Fuentes
+ttf-font-awesome otf-font-awesome
+
+# Desarrollo y base
+base-devel git
+```
+
+### Paquetes AUR (yay)
+
+```bash
+# Instalar yay primero
+git clone https://aur.archlinux.org/yay.git /tmp/yay
+cd /tmp/yay && makepkg -si --noconfirm
+
+# Paquetes AUR
+yay -S matugen arch-update oh-my-posh jetbrains-mono-nerd-font
+```
+
+---
+
+## Estructura del proyecto
+
+```
+~/dotfiles/
+├── bootstrap.sh           # Instalador automático (RECOMENDADO)
+├── install.sh             # Crea symlinks a ~/.config/
+├── update-dotfiles.sh     # Actualiza via git pull
+├── README.md              # Este archivo
+├── AGENTS.md              # Documentación para agentes IA
+│
+├── hypr/                  # Configuración principal de Hyprland
+│   ├── hyprland.conf      # Archivo principal (carga módulos)
+│   ├── modules/           # Módulos modulares
+│   │   ├── binds.conf     # Atajos de teclado
+│   │   ├── appearance.conf # Colores, animaciones, sombras
+│   │   ├── autostart.conf # Apps al iniciar sesión
+│   │   ├── rules.conf     # Reglas de ventanas
+│   │   └── ...
+│   └── scripts/           # Scripts utilitarios
+│       ├── install-updates.sh # Actualizador del sistema
+│       ├── minimize-all.sh    # Minimizar todas las ventanas
+│       └── ...
+│
+├── waybar/                # Barra de estado
+│   ├── config.jsonc       # Configuración principal
+│   ├── style.css          # Estilos
+│   └── scripts/           # Scripts (weather, etc.)
+│
+├── eww/                   # Widgets (Yuck)
+│   ├── eww.yuck           # Definición de widgets
+│   ├── eww.css            # Estilos
+│   └── scripts/           # Scripts auxiliares
+│
+├── rofi/                  # Lanzador de aplicaciones
+│   ├── config.rasi        # Configuración base
+│   ├── launchpad.rasi     # Menú principal
+│   ├── spotlight.rasi     # Menú alternativo
+│   ├── theme-picker.rasi  # Selector de temas
+│   ├── wallpaper-grid.rasi # Selector de wallpapers
+│   └── symphony/          # Scripts avanzados
+│       ├── scripts/       # (keyhints, wifi, clipboard, etc.)
+│       └── custom-rofi/   # Temas personalizados
+│
+├── theme-switcher/        # Sistema de temas
+│   ├── apply-theme.sh    # Script para aplicar temas
+│   ├── current-theme.json # Tema activo
+│   ├── templates/         # Plantillas de configuración
+│   └── themes/            # Temas disponibles
+│       ├── dynamic/      # Tema dinámico (colores desde wallpaper)
+│       ├── catppuccin/   # Tema Catppuccin
+│       ├── tokyonight/  # Tema Tokyo Night
+│       └── ...          # Más temas
+│
+├── kitty/                 # Terminal
+│   ├── kitty.conf        # Configuración principal
+│   ├── theme.conf        # Colores
+│   └── kitty-cursor-trail.conf # Efecto cursor
+│
+├── fish/                 # Shell Fish
+│   ├── config.fish       # Configuración principal
+│   ├── conf.d/           # Módulos adicionales
+│   │   ├── 00_init.fish  # Inicialización
+│   │   ├── 10-aliases.fish # Aliases
+│   │   └── ...
+│   └── fish_variables    # Variables de Fish
+│
+├── swaync/               # Centro de notificaciones
+├── mako/                # Notificaciones alternativas
+├── wlogout/             # Menú de cierre de sesión
+├── ohmyposh/            # Temas para la shell
+├── matugen/             # Generador de colores
+├── fastfetch/           # Información del sistema
+├── local_bin/           # Scripts ejecutables
+│   ├── theme-picker     # Selector de temas (SUPER+F1)
+│   ├── wallpaper-picker # Selector de wallpapers (SUPER+W)
+│   └── vsfetch          # Fetch personalizado
+│
+├── scripts/             # Utilidades del sistema
+│   ├── Weather.sh       # Clima (configurable via bootstrap.sh)
+│   ├── cpu.sh           # Uso de CPU
+│   ├── memory.sh        # Uso de memoria
+│   ├── disk.sh          # Uso de disco
+│   └── updates.sh       # Contador de actualizaciones
+│
+├── fondos/              # Wallpapers incluidos
+└── applications/         # Entradas de escritorio
+```
+
+---
+
+## Personalización
+
+### Cambiar tema (SUPER + F1)
+
+```bash
+# Desde el escritorio
+SUPER + F1
+
+# O desde terminal
+~/.local/bin/theme-picker
+
+# O aplicar tema específico
+~/.config/theme-switcher/apply-theme.sh catppuccin
+```
+
+**Temas disponibles:**
+- `dynamic` - Extrae colores del wallpaper usando matugen
+- `catppuccin`, `tokyonight`, `nord`, `dracula`, `everforest`, etc.
+
+### Cambiar wallpaper (SUPER + W)
+
+```bash
+# Desde el escritorio
+SUPER + W
+
+# O desde terminal
+~/.local/bin/wallpaper-picker
+```
+
+Los wallpapers se encuentran en: `~/dotfiles/fondos/`
+
+### Configurar clima
+
+El script `scripts/Weather.sh` usa OpenWeatherMap. Durante la instalación con `bootstrap.sh` se te preguntará por tu ciudad.
+
+Para cambiarla manualmente:
+```bash
+# Editar la ciudad en scripts/Weather.sh
+# Ejemplo: "Los Mochis" -> "Los+Mochis"
+nano ~/dotfiles/scripts/Weather.sh
+```
 
 ### Modificar atajos de teclado
-Los atajos se definen en `~/.config/hypr/hyprland.conf` en la sección `bind`
 
-### Ajustar comportamiento
-Cada componente tiene sus propios archivos de configuración bien documentados dentro de sus respectivos directorios.
+Los atajos se definen en: `~/.config/hypr/modules/binds.conf`
 
-## ⌨️ Atajos de teclado esenciales
+---
 
-Los atajos de teclado están definidos en `~/.config/hypr/modules/binds.conf`. Aquí están los más importantes:
+## Atajos de teclado
+
+### Básicos
 
 | Atajo | Acción |
 |-------|--------|
-| **SUPER + S** | Abrir expositor de atajos de teclado (keyhints) |
-| **SUPER + ENTER** | Abrir terminal (kitty) |
-| **SUPER + E** | Abrir explorador de archivos (nautilus) |
-| **SUPER + ESPACIO** | Abrir lanzador de aplicaciones (rofi - launchpad) |
-| **SUPER + A** | Abrir lanzador de aplicaciones (rofi - spotlight) |
-| **SUPER + Q** | Cerrar ventana activa |
-| **ALT + F4** | Forzar cierre de ventana activa |
-| **ALT + TAB** | Switcher de ventanas (hyprswitch) |
-| **SUPER + SHIFT + M** | Salir de Hyprland (cerrar sesión) |
-| **SUPER + F** | Alternar pantalla completa |
-| **SUPER + SHIFT + ESPACIO** | Alternar tiling flotante |
-| **SUPER + P** | Alternar pseudo-tiling |
-| **SUPER + T** | Alternar división dividida/vertical |
-| **SUPER + FLECHAS** | Mover foco entre ventanas (izquierda, derecha, arriba, abajo) |
-| **SUPER + H/J/K/L** | Mover foco entre ventanas (izquierda, abajo, arriba, derecha - estilo vim) |
-| **SUPER + SHIFT + FLECHAS** | Mover ventana activa (izquierda, derecha, arriba, abajo) |
-| **SUPER + CTRL + FLECHAS** | Redimensionar ventana activa (50px en dirección) |
-| **SUPER + 1-0** | Cambiar a workspace 1-10 |
-| **SUPER + SHIFT + 1-0** | Mover ventana activa a workspace 1-10 |
-| **SUPER + M** | Mover ventana activa a workspace especial (minimizado) |
-| **SUPER + N** | Restaurar ventana minimizada desde workspace especial |
-| **SUPER + CTRL + M** | Minimizar todas las ventanas |
-| **SUPER + CTRL + N** | Restaurar todas las ventanas minimizadas |
-| **SUPER + Rueda del ratón arriba/abajo** | Cambiar entre workspaces |
-| **SUPER + SHIFT + CLIC izquierdo** | Mover ventana con el ratón |
-| **SUPER + SHIFT + CLIC derecho** | Redimensionar ventana con el ratón |
-| **IMPRESIÓN PANTALLA** | Captura de selección (copiada al portapapeles) |
-| **SHIFT + IMPRESIÓN PANTALLA** | Captura de pantalla completa (guardada en ~/Imágenes/) |
-| **CTRL + IMPRESIÓN PANTALLA** | Copiar pantalla completa al portapapeles |
-| **SUPER + SHIFT + IMPRESIÓN PANTALLA** | Captura de selección con editor (swappy) |
-| **SUPER + V** | Historial de portapapeles (cliphist + rofi) |
-| **SUPER + TAB** | Activar efecto Expo (vista general de workspaces) |
-| **SUPER + SUPR** | Bloquear pantalla (hyprlock) |
-| **SUPER + L** | Bloquear pantalla (hyprlock) |
-| **SUPER + F1** | Abrir selector de temas |
-| **SUPER + W** | Abrir selector de wallpapers |
-| **SUPER + SHIFT + E** | Abrir menú de cierre de sesión (wlogout) |
-| **XF86AudioRaiseVolume** | Subir volumen (pamixer +5%) |
-| **XF86AudioLowerVolume** | Bajar volumen (pamixer -5%) |
-| **XF86AudioMute** | Silenciar/activar audio (pamixer toggle) |
-| **XF86AudioPlay** | Reproducir/pausar multimedia (playerctl) |
-| **XF86AudioNext** | Siguiente pista (playerctl) |
-| **XF86AudioPrev** | Pista anterior (playerctl) |
-| **XF86MonBrightnessUp** | Aumentar brillo (brightnessctl +5%) |
-| **XF86MonBrightnessDown** | Disminuir brillo (brightnessctl -5%) |
+| `SUPER + ENTER` | Abrir terminal (kitty) |
+| `SUPER + ESPACIO` | Abrir launcher (rofi) |
+| `SUPER + A` | Launcher alternativo (spotlight) |
+| `SUPER + S` | Expositor de atajos (keyhints) |
+| `SUPER + E` | Explorador de archivos (nautilus) |
+| `SUPER + Q` | Cerrar ventana activa |
+| `ALT + F4` | Forzar cierre |
+| `ALT + TAB` | Switcher de ventanas (hyprswitch) |
+| `SUPER + SHIFT + M` | Salir de Hyprland |
 
-## 🔧 Solución de problemas comunes
+### Ventanas y foco
 
-### Waybar no se muestra correctamente
+| Atajo | Acción |
+|-------|--------|
+| `SUPER + H/J/K/L` | Mover foco (estilo vim) |
+| `SUPER + FLECHAS` | Mover foco entre ventanas |
+| `SUPER + SHIFT + FLECHAS` | Mover ventana activa |
+| `SUPER + CTRL + FLECHAS` | Redimensionar ventana |
+| `SUPER + F` | Pantalla completa |
+| `SUPER + SHIFT + ESPACIO` | Alternar flotante |
+| `SUPER + P` | Alternar pseudo-tiling |
+| `SUPER + T` | Alternar split |
+
+### Workspaces
+
+| Atajo | Acción |
+|-------|--------|
+| `SUPER + 1-0` | Cambiar a workspace 1-10 |
+| `SUPER + SHIFT + 1-0` | Mover ventana a workspace |
+| `SUPER + M` | Minimizar ventana (workspace especial) |
+| `SUPER + N` | Restaurar ventana minimizada |
+| `SUPER + CTRL + M` | Minimizar todas |
+| `SUPER + CTRL + N` | Restaurar todas |
+| `SUPER + RUEDA` | Cambiar workspace |
+| `SUPER + TAB` | Ver todos los workspaces (Expo) |
+
+### Captura de pantalla
+
+| Atajo | Acción |
+|-------|--------|
+| `PRINT` | Captura de selección (portapapeles) |
+| `SHIFT + PRINT` | Captura completa (~/Imágenes/) |
+| `CTRL + PRINT` | Captura completa (portapapeles) |
+| `SUPER + SHIFT + PRINT` | Captura con editor (swappy) |
+
+### Sistema
+
+| Atajo | Acción |
+|-------|--------|
+| `SUPER + V` | Historial del portapapeles (cliphist) |
+| `SUPER + L` | Bloquear pantalla (hyprlock) |
+| `SUPER + DELETE` | Bloquear pantalla |
+| `SUPER + F1` | Selector de temas |
+| `SUPER + W` | Selector de wallpapers |
+| `SUPER + SHIFT + E` | Menú de cierre (wlogout) |
+
+### Multimedia
+
+| Atajo | Acción |
+|-------|--------|
+| `XF86AudioRaiseVolume` | Subir volumen (+5%) |
+| `XF86AudioLowerVolume` | Bajar volumen (-5%) |
+| `XF86AudioMute` | Silenciar/activar audio |
+| `XF86AudioPlay` | Play/Pausar |
+| `XF86AudioNext` | Siguiente pista |
+| `XF86AudioPrev` | Pista anterior |
+
+### Brillo
+
+| Atajo | Acción |
+|-------|--------|
+| `XF86MonBrightnessUp` | Aumentar brillo (+5%) |
+| `XF86MonBrightnessDown` | Disminuir brillo (-5%) |
+
+---
+
+## Mantenimiento
+
+### Actualizar dotfiles
+
+```bash
+cd ~/dotfiles
+git pull
+# Los cambios se aplican automáticamente gracias a los symlinks
+```
+
+### Actualizar paquetes del sistema
+
+```bash
+# Usando el script incluido
+~/dotfiles/hypr/scripts/install-updates.sh
+
+# O manualmente
+yay
+flatpak update
+```
+
+### Verificar instalación
+
+```bash
+# Ver información del sistema
+fastfetch
+
+# Verificar symlinks
+ls -la ~/.config | grep dotfiles
+```
+
+---
+
+## Solución de problemas
+
+### La barra (waybar) no aparece
+
 ```bash
 # Reiniciar waybar
 pkill waybar && waybar &
 ```
 
-### Atajos de teclado no funcionan
+### Los atajos de teclado no funcionan
+
 ```bash
 # Recargar configuración de Hyprland
-Super + Shift + r
+SUPER + SHIFT + R
 ```
 
-### Problemas con el blanqueo de pantalla
-Verifique la configuración de energía en `~/.config/hypr/hypridle.conf`
-
-## 🔄 Mantenimiento y actualizaciones
-
-Con el método de enlaces simbólicos, actualizar es tan simple como:
+### Wayland no inicia
 
 ```bash
-cd ~/dotfiles
-git pull
-# Los cambios están activos inmediatamente
+# Ver errores
+journalctl -xe | grep -i hypr
+
+# Verificar drivers de GPU
+hyprctl devices
 ```
 
-Para actualizar el sistema de paquetes:
-```bash
-./hypr/scripts/install-updates.sh
-```
+### Problemas con el protector de pantalla
 
-## 🙏 Créditos y licencia
+Verificar: `~/.config/hypr/hypridle.conf`
 
-### Créditos
+---
+
+## Créditos
+
 - [Hyprland](https://hyprland.org/) - Gestor de ventanas Wayland
-- [Oh My Posh](https://ohmyposh.dev/) - Motor de temas para shells
-- [Waybar](https://github.com/Alexays/Waybar) - Barra de estado altamente personalizable
-- Y todos los proyectos de código abierto utilizados en esta configuración
+- [Oh My Posh](https://ohmyposh.dev/) - Temas para shells
+- [Waybar](https://github.com/Alexays/Waybar) - Barra de estado
+- [Eww](https://elkowar.github.io/eww/) - Widgets
+- [Rofi](https://github.com/davatorium/rofi) - Lanzador
+- [Catppuccin](https://github.com/catppuccin/hyprland) - Temas
 
-### Licencia
-Este proyecto está licenciado bajo la licencia MIT - vea el archivo [LICENSE](LICENSE) para más detalles.
+## Licencia
 
-¡Disfrute de su nuevo entorno de escritorio Hyprland!
+MIT License - ver archivo [LICENSE](LICENSE) para más detalles.
+
+---
+
+¡Disfruta de tu nuevo entorno de escritorio Hyprland!
